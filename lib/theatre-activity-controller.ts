@@ -193,14 +193,33 @@ function statusFor(state: TheatreState) {
 
 const RECOVERY_TARGETS: readonly TheatreTarget[] = ["display", "avr", "source", "backlighting"];
 
+// What tells activities apart, and can always be read: after a start with
+// nothing saved, an activity is recovered only once both have answered.
+const IDENTIFYING_TARGETS: readonly TheatreTarget[] = ["display", "avr"];
+
+// The recovery targets with a fresh observation.
+function answered(observations: RecoveryObservations, nowMs: number, freshnessMs: number): TheatreTarget[] {
+  return RECOVERY_TARGETS.filter((target) => {
+    const observation = observations[target];
+    return Boolean(observation && isFresh(observation, nowMs, freshnessMs));
+  });
+}
+
+// Whether a profile is what the observations show: every recovery target,
+// or after a start with nothing saved (partial), every one that answered,
+// the display and the AVR among them.
 function recoveryMatches(
   profile: ActivityProfile,
   observations: RecoveryObservations,
   nowMs: number,
-  freshnessMs: number
+  freshnessMs: number,
+  partial = false
 ): boolean {
+  const fresh = answered(observations, nowMs, freshnessMs);
+  if (partial && !IDENTIFYING_TARGETS.every((target) => fresh.includes(target))) return false;
   return RECOVERY_TARGETS.every((target) => {
     const observation = observations[target];
+    if (partial && !fresh.includes(target)) return true;
     if (!observation || !isFresh(observation, nowMs, freshnessMs)) return false;
     const expected = {...profile[target]};
     if (target === "source") delete expected.readiness;
@@ -306,7 +325,7 @@ export function transitionTheatre(
       if (!optional) continue;
       const targetState = state.targets[target];
       if (!targetState) {
-        state.degraded.push({target, reason: "unconfirmed"});
+        state.degraded.push({target, reason: state.unobserved.includes(target) ? "unobserved" : "unconfirmed"});
       } else if (!isFresh(targetState, nowMs, config.freshnessMs)) {
         state.degraded.push({target, reason: "stale"});
       } else if (targetState.status !== "ready") {
@@ -361,6 +380,11 @@ export function transitionTheatre(
 
     for (const target of REQUIRED_TARGETS) {
       const targetState = state.targets[target];
+      if (!targetState && holdReady && state.unobserved.includes(target)) {
+        // Recovered without it: the activity stays ready until it reports.
+        state.degraded.push({target, reason: "unobserved"});
+        continue;
+      }
       if (targetState && holdReady && targetState.status === "ready" &&
         !isFresh(targetState, nowMs, config.freshnessMs)) {
         unverified(target);
@@ -386,7 +410,8 @@ export function transitionTheatre(
       const source = state.targets.source;
       const staleButHeld = source && holdReady && source.status === "ready" &&
         !isFresh(source, nowMs, config.freshnessMs);
-      if (staleButHeld) unverified("source");
+      if (!source && holdReady && state.unobserved.includes("source")) state.degraded.push({target: "source", reason: "unobserved"});
+      else if (staleButHeld) unverified("source");
       else if (!source || !isFresh(source, nowMs, config.freshnessMs) || source.status !== "ready") {
         state.phase = "waiting_for_source";
         state.currentActivity = "unknown";
@@ -513,6 +538,7 @@ export function transitionTheatre(
     state.phase = "preparing";
     state.currentActivity = "unknown";
     state.targets = emptyTargets();
+    state.unobserved = [];
     state.refreshPending = emptyRefreshPending();
     state.failure = null;
     state.blockedGeneration = null;
@@ -544,6 +570,8 @@ export function transitionTheatre(
     }
 
     const previous = state.targets[event.target];
+    // A target the activity was recovered without has reported.
+    if (state.unobserved.includes(event.target)) state.unobserved = state.unobserved.filter((target) => target !== event.target);
     const bounded = boundObservedAt(event.observedAt, observationTime(event)!, nowMs);
     if (bounded.skewed) {
       trace("target-state", "adjusted", "clock-skew", {target: event.target, reported: event.observedAt, usedAt: bounded.observedAt});
@@ -601,7 +629,10 @@ export function transitionTheatre(
     }
   }
 
-  function acceptRecovery(event: Extract<TheatreInputEvent, {kind: "recover"}>) {
+  // asOfMs: when the observations are judged fresh, now unless given. The
+  // answers to one probe count together, as of the latest of them: the
+  // probes run out only after the freshness window.
+  function acceptRecovery(event: Extract<TheatreInputEvent, {kind: "recover"}>, asOfMs = nowMs) {
     if (!event.observations || typeof event.observations !== "object" ||
       Array.isArray(event.observations)) {
       throw new Error("recovery observations must be an object");
@@ -617,7 +648,7 @@ export function transitionTheatre(
 
     state.recoveryObservations = {};
     const matches = Object.entries(config.activityProfiles)
-      .filter(([, profile]) => recoveryMatches(profile, event.observations, nowMs, config.freshnessMs))
+      .filter(([, profile]) => recoveryMatches(profile, event.observations, asOfMs, config.freshnessMs, event.reason === "startup"))
       .map(([activity]) => activity);
     if (matches.length === 1) {
       const activity = matches[0]!;
@@ -638,8 +669,15 @@ export function transitionTheatre(
       state.transitionStartedAt = requestedAt;
       state.transitionCompletedAt = requestedAt;
       resetTransitionMetrics(state.metrics);
+      const fresh = answered(event.observations, asOfMs, config.freshnessMs);
+      state.unobserved = RECOVERY_TARGETS.filter((target) => !fresh.includes(target));
       for (const target of TARGETS) {
         const observation = event.observations[target];
+        if (state.unobserved.includes(target)) {
+          // Not answered: unconfirmed until it reports.
+          state.targets[target] = null;
+          continue;
+        }
         state.targets[target] = {
           status: "ready",
           observedAt: observation?.observedAt || requestedAt,
@@ -654,12 +692,13 @@ export function transitionTheatre(
       }
       state.phase = "ready";
       state.currentActivity = activity;
-      state.availability = "available";
+      state.degraded = state.unobserved.map((target) => ({target, reason: "unobserved"}));
+      state.availability = state.unobserved.length ? "degraded" : "available";
       state.metrics.recoveriesAdopted += 1;
       completeTransition("ready");
       state.metrics.lastOutcome = "recovery_adopted";
-      emit("recovery_adopted", {reason: event.reason, matchedActivity: activity});
-      trace("recovery", "adopted", null, {reason: event.reason, activity});
+      emit("recovery_adopted", {reason: event.reason, matchedActivity: activity, unobserved: state.unobserved});
+      trace("recovery", "adopted", null, {reason: event.reason, activity, unobserved: state.unobserved});
       return;
     }
 
@@ -707,6 +746,7 @@ export function transitionTheatre(
     acceptTargetObservation(event);
   } else if (event.kind === "startup" || event.kind === "refresh") {
     state.targets = emptyTargets();
+    state.unobserved = [];
     state.refreshPending = emptyRefreshPending();
     if (state.desired) {
       commands.push(...targetRefreshCommands(state.desired, config));
@@ -739,11 +779,13 @@ export function transitionTheatre(
       tickRefreshes();
       if (!state.desired && state.phase === "recovering" &&
         TARGETS.every((target) => state.refreshPending[target] === null || state.refreshPending[target]?.exhausted === true)) {
-        // The probes ran out: recover from what answered, which matches no
-        // profile unless every recovery target did.
+        // The probes ran out: recover from what answered, the display and the
+        // AVR among them; a target that didn't is unobserved.
         trace("recovery", "timed-out", Object.keys(state.recoveryObservations).length ? "partial-observations" : "no-observations",
           {answered: Object.keys(state.recoveryObservations)});
-        acceptRecovery({kind: "recover", reason: "startup", observations: state.recoveryObservations});
+        const latest = Math.max(...Object.values(state.recoveryObservations).map((entry) => Date.parse(entry!.observedAt)));
+        acceptRecovery({kind: "recover", reason: "startup", observations: state.recoveryObservations},
+          Number.isFinite(latest) ? Math.min(latest, nowMs) : nowMs);
       } else {
         reconcile();
       }

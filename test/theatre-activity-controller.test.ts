@@ -992,10 +992,11 @@ test("after a start with nothing saved, the targets' answers to the probe recove
   assert.equal(result.state.metrics.recoveriesAdopted, 1);
   assert.deepEqual(result.commands, []);
 
-  // Answers that fit no single activity: unknown once the probes run out, still commanding nothing.
+  // Answers that fit no activity (the receiver on, its input unknown): unknown once the probes run out,
+  // still commanding nothing.
   result = apply(undefined, {kind: "startup"}, 0);
   result = apply(result.state, observation("display", {mode: "tv"}, 1), 1);
-  result = apply(result.state, observation("avr", {power: "on", source: "shield"}, 1), 1);
+  result = apply(result.state, observation("avr", {power: "on", source: null}, 1), 1);
   for (let seconds = 5; seconds <= 60; seconds += 5) {
     result = apply(result.state, {kind: "tick"}, seconds);
     assert.ok(result.commands.every((command) => command.kind === "refresh"), `at ${seconds} s`);
@@ -1008,4 +1009,45 @@ test("after a start with nothing saved, the targets' answers to the probe recove
   result = apply(result.state, observation("display", {mode: "off"}, 3), 3);
   assert.equal(result.traces.at(-1)?.reason, "not-recovering");
   assert.equal(result.state.currentActivity, "tv_shield");
+});
+
+test("after a start with nothing saved, the display and the AVR are enough: a silent backlight stays unobserved until it reports; a lone source isn't", () => {
+  const observation = (target: TheatreTarget, values: Record<string, unknown>, seconds: number) =>
+    ({kind: "target_observation", target, observedAt: at(seconds).toISOString(), values}) as TheatreInputEvent;
+  const runOut = (result: ReturnType<typeof apply>) => {
+    for (let seconds = 5; seconds <= 120 && result.state.phase === "recovering"; seconds += 5) {
+      result = apply(result.state, {kind: "tick"}, seconds);
+      assert.ok(result.commands.every((command) => command.kind === "refresh"), `nothing but probes at ${seconds} s`);
+    }
+    return result;
+  };
+  // A WLED backlight can't be asked: display, AVR and source answer, the backlight doesn't.
+  let result = apply(undefined, {kind: "startup"}, 0);
+  result = apply(result.state, observation("display", {mode: "tv"}, 1), 1);
+  result = apply(result.state, observation("avr", {power: "on", source: "shield"}, 1.1), 1.1);
+  result = apply(result.state, observation("source", {action: "activate", sourceId: "shield"}, 1.2), 1.2);
+  assert.equal(result.state.phase, "recovering", "it waits for the backlight until the probes run out");
+  result = runOut(result);
+  assert.deepEqual([result.state.phase, result.state.currentActivity, result.state.unobserved], ["ready", "tv_shield", ["backlighting"]]);
+  assert.deepEqual(result.state.degraded, [{target: "backlighting", reason: "unobserved"}]);
+  assert.equal(result.state.availability, "degraded");
+  // Still ready on the next ticks; the backlight's first report confirms it.
+  result = apply(result.state, {kind: "tick", generation: result.state.generation}, 130);
+  assert.equal(result.state.phase, "ready");
+  assert.ok(result.state.degraded.some((entry) => entry.target === "backlighting" && entry.reason === "unobserved"));
+  result = target(result.state, "backlighting", "ready", result.state.generation, 131);
+  assert.deepEqual(result.state.unobserved, []);
+  assert.ok(!result.state.degraded.some((entry) => entry.target === "backlighting"));
+
+  // Only the source answers: it can't tell activities apart, so unknown.
+  result = apply(undefined, {kind: "startup"}, 0);
+  result = apply(result.state, observation("source", {action: "activate", sourceId: "shield"}, 1), 1);
+  result = runOut(result);
+  assert.deepEqual([result.state.phase, result.state.currentActivity], ["idle", "unknown"]);
+  // The display and the AVR without a match among what answered: unknown.
+  result = apply(undefined, {kind: "startup"}, 0);
+  result = apply(result.state, observation("display", {mode: "tv"}, 1), 1);
+  result = apply(result.state, observation("avr", {power: "standby"}, 1), 1);
+  result = runOut(result);
+  assert.deepEqual([result.state.phase, result.state.currentActivity], ["idle", "unknown"]);
 });
