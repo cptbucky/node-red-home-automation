@@ -11,14 +11,15 @@ import {clockMinutes} from "./circadian-schedule";
 // The package's own manifest, loaded as a module from the package root (two
 // levels above dist/lib), so no file is read here. A JSON import would make
 // the compiler copy package.json into dist/, which isn't published.
-const manifest = require("../../package.json") as {name: string; version: string; homepage: string};
+const manifest = require("../../package.json") as {name: string; version: string; repository: {url: string}};
 
 // Home Assistant's `origin` block, abbreviated `o`, with its `name`,
-// `sw` (software version) and `url` (support URL).
+// `sw` (software version) and `url` (support URL): the repository, where
+// issues are raised.
 export const DISCOVERY_ORIGIN = Object.freeze({
   name: manifest.name,
   sw: manifest.version,
-  url: manifest.homepage.split("#")[0]!
+  url: manifest.repository.url.replace(/^git\+/, "").replace(/\.git$/, "")
 });
 
 // Home Assistant's default discovery prefix.

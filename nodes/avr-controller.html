@@ -31,7 +31,8 @@
     return publishChoice(node) !== "off" || (saved && (on(node.publishState) || on(node.discovery)));
   }
   RED.nodes.registerType("home-avr-controller", {
-    category: "home automation",
+    category: "home theatre",
+    paletteLabel: "receiver",
     color: "#c7d9f1",
     defaults: {
       // A marker only a node new from the palette has, as core nodes do: import
