@@ -83,3 +83,16 @@ test("the fused state changes only with an emit", () => {
     occupied = result.state.occupied;
   }
 });
+
+test("a baseline: someone there as Node-RED starts is occupied with nothing sent; an empty room is vacant as usual", () => {
+  for (const source of ["motion", "presence"] as const) {
+    const there = transitionOccupancy(undefined, {source, payload: true, baseline: true}, pirAndPresence);
+    assert.deepEqual([there.outputs, there.state.occupied], [[], true], source);
+  }
+  const empty = transitionOccupancy(undefined, {source: "motion", payload: false, baseline: true}, pirAndPresence);
+  assert.deepEqual(occupancy(empty).map(({occupied}) => occupied), [false]);
+  // After an occupied baseline, motion's next change acts.
+  const there = transitionOccupancy(undefined, {source: "motion", payload: true, baseline: true}, pirOnly);
+  const gone = transitionOccupancy(there.state, {source: "motion", payload: false}, pirOnly);
+  assert.deepEqual(occupancy(gone).map(({occupied}) => occupied), [false]);
+});

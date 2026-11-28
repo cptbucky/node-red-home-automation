@@ -190,7 +190,7 @@ window.DOCS_SEARCH = [
   "section": "Wire sensors to the room controller",
   "description": "Occupancy flows one way: sensors into occupancy fusion, its events into the motion policy, and the policy’s in",
   "url": "guide-motion-occupancy.html#wiring",
-  "text": "Occupancy flows one way: sensors into occupancy fusion, its events into the motion policy, and the policy’s intents into the room lighting controller, which owns the light commands. Occupancy fusion Motion + presence → occupied → Motion lighting policy Occupancy + lux → ON / OFF intents → Room lighting controller Owns the light commands zigbee2mqtt sensor: output 1 (motion, presence) → occupancy fusion · output 2 (illuminance) → motion policy Broker Optional publishing, through each node’s Broker setting Sensors feed occupancy fusion; occupancy and light level feed the motion policy; its intents feed the room controller. The table below names every port. Connections From Connect to Why A zigbee2mqtt sensor , output 1 (or for another sensor, an MQTT in with msg.source set) occupancy fusion input The raw readings to combine: msg.source \"motion\" or \"presence\" . occupancy fusion output 1 motion policy input Occupancy events: msg.source = \"occupancy\" with msg.payload.occupied . A zigbee2mqtt sensor, output 2 (or an MQTT in, msg.source = \"illuminance\" ) motion policy input Lights come on only when it is dark enough. motion policy output 1 room lighting controller input Lighting intents in msg.lighting . occupancy fusion and motion policy Broker settings Node-RED’s MQTT broker node (optional) Their MQTT publications, only when publishing is on. No wire (without a Broker, as before 6.2: each node’s output 2 to MQTT out). Occupancy fusion sends occupied: true on every motion edge from off (or not yet seen) to on, even when the room is already occupied, as happens when presence held it between motion reports; each one makes the policy cancel its countdown and, if enabled and dark enough, send ON again. Only a repeated motion-on while motion is still on is dropped. Motion going off sends occupied: false unless presence is holding the room, and the first motion reading the node has seen (nothing saved yet) sends it if it is off, even when the room is already vacant. Choose the presence mode. On occupancy fusion, Presence sensor defaults to “None (PIR only)”. Choose “Hold occupancy (PIR + mmWave)” if you wire a presence sensor in. Name the lights. ON targets and OFF targets on the motion policy are JSON arrays of target ids from the room controller’s Targets JSON . Both default to [\"main\"] , the target id in the example flow. Set the vacancy time and lux cutoff. See Vacancy delay and other settings below."
+  "text": "Occupancy flows one way: sensors into occupancy fusion, its events into the motion policy, and the policy’s intents into the room lighting controller, which owns the light commands. Occupancy fusion Motion + presence → occupied → Motion lighting policy Occupancy + lux → ON / OFF intents → Room lighting controller Owns the light commands zigbee2mqtt sensor: output 1 (motion, presence) → occupancy fusion · output 2 (illuminance) → motion policy Broker Optional publishing, through each node’s Broker setting Sensors feed occupancy fusion; occupancy and light level feed the motion policy; its intents feed the room controller. The table below names every port. Connections From Connect to Why A sensor adapter ( zigbee2mqtt sensor , Everything Presence One , Apollo R PRO-1 ), output 1 (or for another sensor, an MQTT in with msg.source set) occupancy fusion input The raw readings to combine: msg.source \"motion\" or \"presence\" . occupancy fusion output 1 motion policy input Occupancy events: msg.source = \"occupancy\" with msg.payload.occupied . A sensor adapter, output 2 (or an MQTT in, msg.source = \"illuminance\" ) motion policy input Lights come on only when it is dark enough. motion policy output 1 room lighting controller input Lighting intents in msg.lighting . occupancy fusion and motion policy Broker settings Node-RED’s MQTT broker node (optional) Their MQTT publications, only when publishing is on. No wire (without a Broker, as before 6.2: each node’s output 2 to MQTT out). Occupancy fusion sends occupied: true on every motion edge from off (or not yet seen) to on, even when the room is already occupied, as happens when presence held it between motion reports; each one makes the policy cancel its countdown and, if enabled and dark enough, send ON again. Only a repeated motion-on while motion is still on is dropped. Motion going off sends occupied: false unless presence is holding the room, and the first motion reading the node has seen (nothing saved yet) sends it if it is off, even when the room is already vacant. Choose the presence mode. On occupancy fusion, Presence sensor defaults to “None (PIR only)”. Choose “Hold occupancy (PIR + mmWave)” if you wire a presence sensor in. Name the lights. ON targets and OFF targets on the motion policy are JSON arrays of target ids from the room controller’s Targets JSON . Both default to [\"main\"] , the target id in the example flow. Set the vacancy time and lux cutoff. See Vacancy delay and other settings below."
  },
  {
   "title": "Light a room from motion",
@@ -701,7 +701,7 @@ window.DOCS_SEARCH = [
   "section": "Choose an adapter",
   "description": "shelly cover A Gen2-or-later relay device in cover mode, calibrated on the device. Position covers only. It su",
   "url": "guide-device-adapters.html#choose",
-  "text": "shelly cover A Gen2-or-later relay device in cover mode, calibrated on the device. Position covers only. It subscribes to <prefix>/# . zigbee2mqtt cover A Zigbee cover paired with Zigbee2MQTT. Position covers, or open, close and stop only. It subscribes to the device topic and its availability. zigbee2mqtt light A Zigbee light or group paired with Zigbee2MQTT, for a room lighting controller. It subscribes to the light’s state, /set and availability. shelly switch A Gen2-or-later relay behind a wall switch: in detached mode, the switch’s presses for the switch policy; otherwise, the relay as the light. It subscribes to <prefix>/# . zigbee2mqtt sensor A Zigbee motion, presence or light sensor paired with Zigbee2MQTT, for a room’s occupancy fusion and motion lighting policy. It subscribes to the device topic and its availability. wled A WLED strip as a TV backlight, for a backlighting controller: on and off. It subscribes to its device topic’s /g and /status . For any other device, the controller’s neutral commands and readings are the contract to map to; for a light, the room’s neutral light contract ."
+  "text": "shelly cover A Gen2-or-later relay device in cover mode, calibrated on the device. Position covers only. It subscribes to <prefix>/# . zigbee2mqtt cover A Zigbee cover paired with Zigbee2MQTT. Position covers, or open, close and stop only. It subscribes to the device topic and its availability. zigbee2mqtt light A Zigbee light or group paired with Zigbee2MQTT, for a room lighting controller. It subscribes to the light’s state, /set and availability. shelly switch A Gen2-or-later relay behind a wall switch: in detached mode, the switch’s presses for the switch policy; otherwise, the relay as the light. It subscribes to <prefix>/# . zigbee2mqtt sensor A Zigbee motion, presence or light sensor paired with Zigbee2MQTT, for a room’s occupancy fusion and motion lighting policy. It subscribes to the device topic and its availability. everything presence one An Everything Presence One (ESPHome), for a room’s occupancy fusion and motion lighting policy: its PIR, mmWave radar and light sensor. apollo r pro-1 An Apollo R PRO-1 (ESPHome), for a room’s occupancy fusion and motion lighting policy: its two radars and its light sensor. wled A WLED strip as a TV backlight, for a backlighting controller: on and off. It subscribes to its device topic’s /g and /status . For any other device, the controller’s neutral commands and readings are the contract to map to; for a light, the room’s neutral light contract ."
  },
  {
   "title": "Connect a device",
@@ -907,7 +907,7 @@ window.DOCS_SEARCH = [
   "section": "Inputs",
   "description": "Each message names its sensor in msg.source . Other sources are ignored. Input messages msg.source msg.payload",
   "url": "node-occupancy-fusion.html#inputs",
-  "text": "Each message names its sensor in msg.source . Other sources are ignored. Input messages msg.source msg.payload Effect \"motion\" A boolean, a string, or an object with motion , occupancy or active Motion on makes the area occupied. Motion off makes it vacant unless a held presence keeps it. \"presence\" A boolean, a string, or an object with presence , occupancy or active Only with Presence sensor set to hold. Presence on holds occupancy that motion established; presence off with motion off makes the area vacant. \"startup\" Any Announce the MQTT publications again, as after the broker reconnects. msg.status from a Status node MQTT out’s “connected” Taken as the startup message ( msg.source = \"startup\" ), so the node announces itself again once the broker can take it. Wire in a Status node whose scope is your MQTT out node. Any other status message is ignored. Strings read as on: on , true , occupied , active , detected . Strings read as off: off , false , clear , inactive , not_detected . Case does not matter; anything else is ignored. Motion from a sensor · msg { source: \"motion\", payload: {motion: true} }"
+  "text": "Each message names its sensor in msg.source . Other sources are ignored. Input messages msg.source msg.payload Effect \"motion\" A boolean, a string, or an object with motion , occupancy or active Motion on makes the area occupied. Motion off makes it vacant unless a held presence keeps it. \"presence\" A boolean, a string, or an object with presence , occupancy or active Only with Presence sensor set to hold. Presence on holds occupancy that motion established; presence off with motion off makes the area vacant. \"startup\" Any Announce the MQTT publications again, as after the broker reconnects. msg.status from a Status node MQTT out’s “connected” Taken as the startup message ( msg.source = \"startup\" ), so the node announces itself again once the broker can take it. Wire in a Status node whose scope is your MQTT out node. Any other status message is ignored. Strings read as on: on , true , occupied , active , detected . Strings read as off: off , false , clear , inactive , not_detected . Case does not matter; anything else is ignored. A baseline. A motion or presence message with msg.baseline = true is the sensor’s state as Node-RED starts, such as an ESPHome sensor’s retained state while the device is online ( Everything Presence One , Apollo R PRO-1 ): the room as it is, not a new detection. On (motion or presence) makes the area occupied and sends nothing, so no light is switched on; motion acts from its next change. Off is read as usual, so an empty room sends occupied: false and the motion policy starts its vacancy countdown. Motion from a sensor · msg { source: \"motion\", payload: {motion: true} }"
  },
  {
   "title": "Occupancy fusion",
@@ -1898,6 +1898,102 @@ window.DOCS_SEARCH = [
   "description": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Li",
   "url": "node-z2m-sensor.html#readings",
   "text": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Light level is illuminance_lux where the device sends it (older devices, beside a raw illuminance ), otherwise illuminance , in lux. Only changes are sent: a report whose values haven’t changed, such as a battery or temperature update, sends nothing. A retained occupancy or presence , with retain set for the device in Zigbee2MQTT, is never acted on: after a restart it is an old reading, and a light switched on from it would be wrong. The next report the sensor sends is passed on, whatever it says. A retained light level is passed on. Availability shows on the status ( offline ); nothing is sent for it. After a restart the room learns the sensor’s state on its next change: Zigbee2MQTT doesn’t retain a device’s state by default, and a battery sensor can’t be asked for a reading."
+ },
+ {
+  "title": "Everything Presence One",
+  "description": "Message shapes, output ports and settings for the adapter between an Everything Presence One and a room's occupancy fusion and motion lighting policy.",
+  "url": "node-everything-presence-one.html",
+  "text": "Message shapes, output ports and settings for the adapter between an Everything Presence One and a room's occupancy fusion and motion lighting policy."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Everything Presence One, as the room takes it",
+  "description": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “",
+  "url": "node-everything-presence-one.html#summary",
+  "text": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “everything presence one”) turns an Everything Presence One’s PIR, mmWave radar and light sensor (Everything Smart Technology’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. Looking for wiring? Follow Motion and occupancy ."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "What it reads",
+  "description": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary",
+  "url": "node-everything-presence-one.html#entities",
+  "text": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary_sensor/mmwave The mmWave radar: sees someone sitting still, so occupancy fusion holds the room while they stay. Light level sensor/illuminance In lux. Its own occupancy entity isn’t read: it combines the PIR and radar on the device, and occupancy fusion does that combining here."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Inputs",
+  "description": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and prese",
+  "url": "node-everything-presence-one.html#inputs",
+  "text": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and presence, as below. The broker <device>/sensor/<entity>/state : a number The light level. The broker <device>/status : online or offline Shown on the status; decides whether retained states count. An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
+  "url": "node-everything-presence-one.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} , with baseline: true at a start Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input. These are fixed: output 1 carries only booleans from ON and OFF , output 2 only a number. Anything else, such as nan , is ignored with a trace and never passed on. Only a change is sent."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-everything-presence-one.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s MQTT topic prefix: its ESPHome name unless set otherwise. It cannot contain + or # ."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "As Node-RED starts",
+  "description": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While t",
+  "url": "node-everything-presence-one.html#restart",
+  "text": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is online , they are its current state, and the node passes motion and presence on with baseline: true (presence first): Someone there: occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change. Room empty: fusion sends occupied: false , so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out. Device not online: its retained states are ignored. States that arrive before its status are held until it says online ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "description": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy.",
+  "url": "node-apollo-r-pro-1.html",
+  "text": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Apollo R PRO-1, as the room takes it",
+  "description": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) t",
+  "url": "node-apollo-r-pro-1.html#summary",
+  "text": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) turns an Apollo R PRO-1’s two radars and light sensor (Apollo Automation’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. Looking for wiring? Follow Motion and occupancy ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "What it reads",
+  "description": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says ",
+  "url": "node-apollo-r-pro-1.html#entities",
+  "text": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says so, and off when every one that has reported says off. Apollo’s firmware has named the LD2450’s entities both ways: without a prefix ( presence , moving_target ) on earlier releases, and with ld2450_ on current ones. The node reads both, and an entity your firmware never publishes doesn’t count. Entities Role Entities What it is Motion binary_sensor/moving_target or binary_sensor/ld2450_moving_target , and binary_sensor/ld2412_moving_target A moving target, from either radar. Presence binary_sensor/presence or binary_sensor/ld2450_presence , and binary_sensor/ld2412_presence Anyone there, still or moving, from either radar. Light level sensor/ltr390_light The LTR390, in lux."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Inputs",
+  "description": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and prese",
+  "url": "node-apollo-r-pro-1.html#inputs",
+  "text": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and presence, as below. The broker <device>/sensor/<entity>/state : a number The light level. The broker <device>/status : online or offline Shown on the status; decides whether retained states count. An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
+  "url": "node-apollo-r-pro-1.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} , with baseline: true at a start Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input. These are fixed: output 1 carries only booleans from ON and OFF , output 2 only a number. Anything else, such as nan , is ignored with a trace and never passed on. Only a change is sent."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-apollo-r-pro-1.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s MQTT topic prefix: its ESPHome name unless set otherwise. It cannot contain + or # ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "As Node-RED starts",
+  "description": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While t",
+  "url": "node-apollo-r-pro-1.html#restart",
+  "text": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is online , they are its current state, and the node passes motion and presence on with baseline: true (presence first): Someone there: occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change. Room empty: fusion sends occupied: false , so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out. Device not online: its retained states are ignored. States that arrive before its status are held until it says online ."
  },
  {
   "title": "WLED",

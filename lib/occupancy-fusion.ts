@@ -15,6 +15,11 @@ export interface OccupancyState {
 export interface OccupancyInput {
   source: string;
   payload: unknown;
+  // A sensor's state as Node-RED starts (msg.baseline = true), such as a
+  // device's retained state while it is online: the room as it is, not a
+  // new detection. Occupied, it switches nothing on; empty, the room's
+  // vacancy starts as if it began now.
+  baseline?: boolean;
 }
 
 export interface OccupancyConfig {
@@ -117,7 +122,12 @@ export function transitionOccupancy(
     state.motionKnown = true;
     state.motionActive = active;
 
-    if (active) {
+    if (active && input.baseline === true) {
+      // Someone is there as Node-RED starts: occupied, but nothing is sent,
+      // so no light is switched on. Motion acts from its next change.
+      state.occupied = true;
+      trace("motion", "baseline", "occupied-at-start");
+    } else if (active) {
       state.occupied = true;
       if (!wasKnown || !wasActive) {
         emit(true, "motion-active", "motion");
@@ -141,7 +151,13 @@ export function transitionOccupancy(
     state.presenceKnown = true;
     state.presenceActive = active;
 
-    if (active) {
+    if (active && input.baseline === true) {
+      // Presence as Node-RED starts is someone there: it holds the room as
+      // occupied, sending nothing, though live presence alone never starts
+      // occupancy.
+      state.occupied = true;
+      trace("presence", "baseline", "occupied-at-start");
+    } else if (active) {
       trace("presence", state.occupied ? "held" : "standby", state.occupied ? "presence-active" : "motion-required");
     } else if (!state.motionActive && (!wasKnown || wasActive || state.occupied)) {
       emit(false, "all-sources-inactive");

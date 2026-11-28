@@ -123,6 +123,9 @@
 <script type="text/html" data-help-name="home-occupancy-fusion">
   <p>Combines normalised <code>motion</code> and optional <code>presence</code> events into <code>msg.source = "occupancy"</code>.</p>
   <p>PIR establishes occupancy. Presence can hold an established occupancy but cannot establish one by itself.</p>
+  <p>With <code>msg.baseline = true</code>, a motion or presence message is the sensor's state as Node-RED starts (such
+    as an ESPHome sensor's retained state): on makes the area occupied without sending anything, so no light is switched
+    on; off is read as usual, so an empty room starts the motion policy's vacancy countdown.</p>
   <h3>Publishing</h3>
   <p>Off unless switched on. Both are named after the <b>Area</b>, which is needed then; topics use it in lowercase,
     with spaces and other characters as <code>_</code>.</p>
