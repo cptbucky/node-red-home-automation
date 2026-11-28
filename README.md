@@ -143,8 +143,8 @@ Example: [`House schedule.json`](https://github.com/avantics-hq/node-red-home-au
 A scene, such as "Exercise mode" or "Bath", takes some of a room's lights for
 a while: it holds each on or off with the values it gives them, and pauses
 motion lighting. It ends by request, by its safety timer (4 hours by default;
-0 turns it off), or when your flow sends it an end, such as when a trainer's
-power falls. Each room then gives its lights back what they were (see "Room
+0 turns it off), when a device's power, from a power meter node on its plug,
+stays below its End below for a while, or when your flow sends it an end. Each room then gives its lights back what they were (see "Room
 light control"): a light the room was running is the room's again, on or off
 as it was, in the room's style as it is now; one that was off goes off; one a
 person had set gets their values back. A light a person changes during the
@@ -167,7 +167,7 @@ two rooms may each have a `main`:
 ```
 
 Start it with `msg.scene = {kind: "start"}` and end it with
-`msg.scene = {kind: "end", by: "trainer off"}` (`by` is optional and shows
+`msg.scene = {kind: "end", by: "door opened"}` (`by` is optional and shows
 on its status). Example: [`Scene.json`](https://github.com/avantics-hq/node-red-home-automation/blob/main/examples/Scene.json).
 
 | Node | Purpose |
@@ -186,6 +186,7 @@ on output 2. Example: [`Home theatre equipment.json`](https://github.com/avantic
 | `home-display-mode-controller` | Coordinates TV, projector, and screen transitions. |
 | `home-source-capability-controller` | Gates source readiness on fresh availability, active-device, application or playback evidence. |
 | `home-backlighting-controller` | Owns TV-backlight power with observation-gated confirmation. |
+| `home-z2m-power` | Reads a Zigbee2MQTT plug or meter's power as `msg.power`: the display controller's projector power, or a scene's End below. |
 | `home-wled` | Connects a WLED strip to a backlighting controller over WLED's own MQTT: on and off, read back from the brightness WLED reports. |
 
 The display controller reads the projector's power from any meter or adapter:

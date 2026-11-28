@@ -198,3 +198,30 @@ test("lights by area: two rooms each with a main, one scene for one of them; a r
   const other = transitionRoom(lounge.state(), {lighting: {kind: "intent", area: "study", targets: ["main"], state: "OFF", source: "scene"}}, roomConfig, at(30));
   assert.deepEqual(other.traces.map(({event, outcome, reason}) => [event, outcome, reason]), [["intent", "ignored", "other-area"]]);
 });
+
+
+test("End below: power under it, held for its seconds while on, ends the scene by power; a reading at or above starts the wait again", () => {
+  const plug = normaliseSceneConfig({owner: "scene:Exercise", lights: "[]", endBelowWatts: 20, endBelowSeconds: 60});
+  assert.deepEqual([plug.endBelowWatts, plug.endBelowMs], [20, 60000]);
+  // Saved before the setting, or left empty: no power end; the hold defaults to a minute.
+  assert.deepEqual([normaliseSceneConfig({owner: "o"}).endBelowWatts, normaliseSceneConfig({owner: "o", endBelowWatts: ""}).endBelowWatts,
+    normaliseSceneConfig({owner: "o"}).endBelowMs], [null, null, 60000]);
+  assert.throws(() => normaliseSceneConfig({owner: "o", endBelowWatts: 0}), /more than 0 watts/);
+  let result = run(plug, undefined, {kind: "start"}, 0);
+  result = run(plug, result.state, {kind: "power", watts: 150}, 10);
+  assert.equal(result.state.powerBelowSince, null);
+  result = run(plug, result.state, {kind: "power", watts: 5}, 20);
+  assert.deepEqual([result.state.active, result.state.powerBelowSince], [true, at(20)]);
+  // A short dip: back above before a minute, so the wait starts again.
+  result = run(plug, result.state, {kind: "power", watts: 120}, 50);
+  assert.deepEqual([result.state.active, result.state.powerBelowSince], [true, null]);
+  result = run(plug, result.state, {kind: "power", watts: 4}, 60);
+  assert.equal(sceneTickAt(result.state, at(60), plug), at(120), "the scene wakes when the hold would end");
+  // No further reading (a plug reports only on change): the timer ends it.
+  result = run(plug, result.state, {kind: "tick"}, 120);
+  assert.deepEqual([result.state.active, result.state.ended?.by], [false, "power"]);
+  // Off, or without End below: a reading changes nothing.
+  assert.equal(run(plug, result.state, {kind: "power", watts: 1}, 130).traces[0]?.reason, "not-active");
+  const none = run(exercise, run(exercise, undefined, {kind: "start"}, 0).state, {kind: "power", watts: 1}, 1);
+  assert.deepEqual([none.state.active, none.traces[0]?.reason], [true, "no-end-below"]);
+});

@@ -30,6 +30,7 @@ flowchart TB
     ZC[z2m-cover]
     SC[shelly-cover]
     WL[wled]
+    ZP[z2m-power]
     ZS[z2m-sensor /<br/>ESPHome sensors]
   end
   BROKER[(MQTT broker)]
@@ -64,6 +65,7 @@ flowchart TB
   AL -- held-light intents --> ROOM
   EQ -- device commands --> AV
   EQ <-- backlight power and readings --> WL
+  ZP -- power readings --> EQ
 
   Adapt <-- subscribe and publish --> BROKER
   CON <-- requests in, retained state and discovery out --> BROKER

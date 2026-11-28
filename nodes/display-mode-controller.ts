@@ -120,7 +120,9 @@ const registerDisplayModeController: NodeInitializer = (RED) => {
         return;
       }
       if (command.device === "projector" && command.operation === "query_power" && !projectorPowerMeterHost) {
-        node.send([null, null, {payload: "query", display_command: command}]);
+        // power: {kind: "read"} too, so a power meter node (such as a
+        // zigbee2mqtt power node) can be wired straight to it.
+        node.send([null, null, {payload: "query", display_command: command, power: {kind: "read"}}]);
         return;
       }
       const result = await transport.execute(command);
@@ -143,6 +145,13 @@ const registerDisplayModeController: NodeInitializer = (RED) => {
     }
 
     onInput(node, (msg, send) => {
+      // A power meter node's reading (msg.power) is its projector's power.
+      const power = objectField<{kind?: unknown; watts?: unknown; observedAt?: unknown}>(msg, "power");
+      if (power?.kind === "observed" && !objectField(msg, "display")) {
+        process({display: {kind: "observed", device: "projector", watts: power.watts,
+          ...(typeof power.observedAt === "string" ? {observedAt: power.observedAt} : {})} as DisplayMessage["display"]}, send);
+        return;
+      }
       process({
         display: objectField<DisplayMessage["display"]>(msg, "display")
       }, send);

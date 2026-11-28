@@ -72,6 +72,17 @@
         }},
         lights: {value: "[]", required: true, validate: validLights},
         safetyHours: {value: 4, required: true, validate: function (v) { var n = Number(v); return String(v).trim() !== "" && isFinite(n) && n >= 0; }},
+        // Optional: a power meter's reading (msg.power) below this many watts,
+        // for endBelowSeconds, ends the scene. Empty: none. A scene saved
+        // before these settings loads without them, which is valid.
+        endBelowWatts: {value: "", validate: function (v) {
+          if (v === undefined || v === null || String(v).trim() === "") return true;
+          var n = Number(v); return isFinite(n) && n > 0;
+        }},
+        endBelowSeconds: {value: 60, validate: function (v) {
+          if (v === undefined || v === null || String(v).trim() === "") return true;
+          var n = Number(v); return isFinite(n) && n >= 0;
+        }},
         area: {value: "", validate: function (v) { return !needsArea(this) || /[a-z0-9]/i.test(String(v || "")); }},
         // Off until switched on.
         // Publish: off, state or discovery. null means "not set": a node saved
@@ -129,6 +140,10 @@
   <div class="form-row"><label for="node-input-name">Name</label><input type="text" id="node-input-name" placeholder="Bath, for example"></div>
   <div class="form-row"><label for="node-input-lights">Lights</label><input type="text" id="node-input-lights" placeholder='[{"area":"gym","target":"main","state":"OFF"}]'></div>
   <div class="form-row"><label for="node-input-safetyHours">Safety timer (hours)</label><input type="number" id="node-input-safetyHours" min="0" step="0.25"> <span>(0: off)</span></div>
+  <div class="form-row"><label for="node-input-endBelowWatts">End below (W)</label><input type="number" id="node-input-endBelowWatts" min="0" step="1" placeholder="none"> <span>for</span>
+    <input type="number" id="node-input-endBelowSeconds" min="0" step="1" style="width:70px"> <span>s</span></div>
+  <div class="form-tips">Wire a power meter node (such as a zigbee2mqtt power node on a device's plug) to the scene: power
+    below this, held that long, ends the scene "by power".</div>
   <div class="form-row"><label for="node-input-area">Area</label><input type="text" id="node-input-area"></div>
   <div class="form-row">
     <label for="node-input-homeAssistant">Publish</label>
@@ -162,9 +177,11 @@
   <dl class="message-properties">
     <dt>scene <span class="property-type">object</span></dt>
     <dd><code>{kind: "start"}</code> turns it on (on again: a fresh safety timer, its lights left as they are);
-      <code>{kind: "end", by}</code> ends it, with <code>by</code> (optional) shown as what ended it. An end
-      trigger, such as a trainer's power falling, is a flow that sends this end when its condition is met.
-      <code>{kind: "startup"}</code> announces its switch again.</dd>
+      <code>{kind: "end", by}</code> ends it, with <code>by</code> (optional) shown as what ended it, for any
+      end trigger a flow decides. <code>{kind: "startup"}</code> announces its switch again.</dd>
+    <dt>power <span class="property-type">object</span></dt>
+    <dd><code>{kind: "observed", watts}</code> from a power meter node: with <b>End below</b> set, power below it,
+      held for its seconds, ends the scene <i>by power</i>.</dd>
     <dt>payload <span class="property-type">string</span></dt>
     <dd><code>ON</code> or <code>OFF</code> on its set topic, from Home Assistant: a start, or an end by
       <code>home-assistant</code>.</dd>
@@ -205,6 +222,9 @@
       <code>[{"area": "gym", "target": "main", "state": "OFF"}, {"area": "gym", "target": "tv", "state": "ON"}]</code>.</dd>
     <dt>Safety timer</dt><dd>Hours until it ends itself, so a forgotten scene doesn't hold the room: 4 by
       default; 0 turns it off.</dd>
+    <dt>End below</dt><dd>Optional: watts, and for how many seconds (60 by default). A power reading
+      (<code>msg.power</code>, from a power meter node on a device's plug) below it, held that long while the
+      scene is on, ends it <i>by power</i>; one at or above it starts the wait again. Empty: no power end.</dd>
     <dt>Area, Publish</dt><dd><i>Don't publish</i> unless chosen. <i>MQTT state</i>: its state and set topic, plain
       MQTT; <i>MQTT state and Home Assistant discovery</i>: also a switch entity for the scene
       that shows whether it is on and turns it on and off, on <code>home/&lt;area&gt;/scene/&lt;name&gt;/…</code>.</dd>

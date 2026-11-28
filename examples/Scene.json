@@ -3,7 +3,7 @@
     "id": "example-scene-comment",
     "type": "comment",
     "name": "Scene example",
-    "info": "Needs: No devices: Debug nodes stand in for your room lighting controller and motion lighting policy.\n\nOne scene, \"Exercise mode\": while it is on, it holds the room's main light off and its tv socket on, and pauses motion lighting. It ends by request, by its safety timer (4 hours), or when the trainer's power falls below 20 W for this flow's end trigger.\n\nWire output 1 to your room lighting controller, whose Targets JSON names main and tv (mark the socket \"onOffOnly\": true), and set each light's area in the scene's Lights to the room's Area (a room acts only on a scene's lights for its own Area). Wire output 2 to your motion lighting policy. To start and stop it from Home Assistant, give it an area and set Publish to MQTT state and Home Assistant discovery: it reads home/<area>/scene/exercise_mode/set from the broker. Replace the \"trainer power\" inject with your power reading: the switch and change nodes are the end trigger, so the condition is yours to set.\n\nWhen it ends, the room gives each light back what it was before the scene, and motion lighting resumes.\n\nBefore deploying, open the \"your MQTT broker\" config node (any node's Broker setting) and set your broker's host: every node here that talks MQTT subscribes and publishes through it, with no MQTT in, MQTT out or status nodes.",
+    "info": "Needs: No devices: Debug nodes stand in for your room lighting controller and motion lighting policy.\n\nOne scene, \"Exercise mode\": while it is on, it holds the room's main light off and its tv socket on, and pauses motion lighting. It ends by request, by its safety timer (4 hours), or when a device's power, from a power meter on its plug, stays below 20 W for a minute (its End below).\n\nWire output 1 to your room lighting controller, whose Targets JSON names main and tv (mark the socket \"onOffOnly\": true), and set each light's area in the scene's Lights to the room's Area (a room acts only on a scene's lights for its own Area). Wire output 2 to your motion lighting policy. To start and stop it from Home Assistant, give it an area and set Publish to MQTT state and Home Assistant discovery: it reads home/<area>/scene/exercise_mode/set from the broker. Replace the \"a device's power\" inject with a power meter node on the device's plug (such as a zigbee2mqtt power node), wired to the scene; set End below for your device, or clear it for no power end.\n\nWhen it ends, the room gives each light back what it was before the scene, and motion lighting resumes.\n\nBefore deploying, open the \"your MQTT broker\" config node (any node's Broker setting) and set your broker's host: every node here that talks MQTT subscribes and publishes through it, with no MQTT in, MQTT out or status nodes.",
     "x": 150,
     "y": 40,
     "wires": []
@@ -59,12 +59,12 @@
   {
     "id": "example-scene-power",
     "type": "inject",
-    "name": "trainer power",
+    "name": "a device's power: 5 W",
     "props": [
       {
-        "p": "payload",
-        "v": "5",
-        "vt": "num"
+        "p": "power",
+        "v": "{\"kind\":\"observed\",\"watts\":5}",
+        "vt": "json"
       }
     ],
     "repeat": "",
@@ -73,56 +73,6 @@
     "onceDelay": 0.1,
     "topic": "",
     "x": 140,
-    "y": 240,
-    "wires": [
-      [
-        "example-scene-below"
-      ]
-    ]
-  },
-  {
-    "id": "example-scene-below",
-    "type": "switch",
-    "name": "below 20 W",
-    "property": "payload",
-    "propertyType": "msg",
-    "rules": [
-      {
-        "t": "lt",
-        "v": "20",
-        "vt": "num"
-      }
-    ],
-    "checkall": "true",
-    "repair": false,
-    "outputs": 1,
-    "x": 330,
-    "y": 240,
-    "wires": [
-      [
-        "example-scene-to-end"
-      ]
-    ]
-  },
-  {
-    "id": "example-scene-to-end",
-    "type": "change",
-    "name": "end: trainer off",
-    "rules": [
-      {
-        "t": "set",
-        "p": "scene",
-        "pt": "msg",
-        "to": "{\"kind\":\"end\",\"by\":\"trainer off\"}",
-        "tot": "json"
-      }
-    ],
-    "action": "",
-    "property": "",
-    "from": "",
-    "to": "",
-    "reg": false,
-    "x": 520,
     "y": 240,
     "wires": [
       [
@@ -151,7 +101,9 @@
       []
     ],
     "broker": "example-mqtt-broker",
-    "homeAssistant": "off"
+    "homeAssistant": "off",
+    "endBelowWatts": 20,
+    "endBelowSeconds": 60
   },
   {
     "id": "example-scene-rooms",

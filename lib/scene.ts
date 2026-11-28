@@ -28,7 +28,13 @@ export interface SceneConfig {
   lights: SceneLight[];
   // How long it stays on unless ended sooner; 0: until ended.
   safetyMs: number;
+  // Its power end: a device's power (msg.power) below this many watts for
+  // endBelowMs ends it "by power"; null: none.
+  endBelowWatts: number | null;
+  endBelowMs: number;
 }
+
+export const DEFAULT_END_BELOW_SECONDS = 60;
 
 export const DEFAULT_SAFETY_HOURS = 4;
 // How often an active scene renews its motion pause and its status: well
@@ -46,13 +52,17 @@ export interface SceneState {
   endsAt: number | null;
   // How it last ended.
   ended: {by: string; at: number} | null;
+  // Since when the power has been below its End below, while it is on.
+  powerBelowSince: number | null;
 }
 
 // What a flow sends it, on msg.scene.
 export interface SceneEvent {
   kind?: unknown;
-  // On an end: what ended it, shown on its status, such as "trainer off".
+  // On an end: what ended it, shown on its status, such as "door opened".
   by?: unknown;
+  // On kind "power": a power meter's reading, in watts.
+  watts?: unknown;
 }
 
 // Messages for its outputs: owner intents and releases for room controllers,
@@ -66,7 +76,7 @@ export interface SceneMotion {
   owner: string;
 }
 
-export function normaliseSceneConfig(raw: {owner: string; lights?: unknown; safetyHours?: unknown}): SceneConfig {
+export function normaliseSceneConfig(raw: {owner: string; lights?: unknown; safetyHours?: unknown; endBelowWatts?: unknown; endBelowSeconds?: unknown}): SceneConfig {
   const parsed = jsonSetting(raw.lights, "lights", []);
   if (!Array.isArray(parsed)) throw new Error("lights must be a JSON array");
   const seen = new Set<string>();
@@ -100,7 +110,13 @@ export function normaliseSceneConfig(raw: {owner: string; lights?: unknown; safe
   });
   const hours = numberSetting(raw.safetyHours, "safety timer", DEFAULT_SAFETY_HOURS);
   if (hours < 0) throw new Error("safety timer must be 0 (off) or more hours");
-  return {owner: raw.owner, lights, safetyMs: Math.round(hours * 3_600_000)};
+  // Optional: empty (or a scene saved before it) means no power end.
+  const below = raw.endBelowWatts === undefined || raw.endBelowWatts === null || String(raw.endBelowWatts).trim() === ""
+    ? null : numberSetting(raw.endBelowWatts, "end below", 0);
+  if (below !== null && below <= 0) throw new Error("end below must be more than 0 watts, or empty for none");
+  const seconds = numberSetting(raw.endBelowSeconds, "end below for", DEFAULT_END_BELOW_SECONDS);
+  if (seconds < 0) throw new Error("end below for must be 0 or more seconds");
+  return {owner: raw.owner, lights, safetyMs: Math.round(hours * 3_600_000), endBelowWatts: below, endBelowMs: Math.round(seconds * 1000)};
 }
 
 export function createSceneState(saved: Partial<SceneState> = {}): SceneState {
@@ -113,7 +129,8 @@ export function createSceneState(saved: Partial<SceneState> = {}): SceneState {
       : [],
     startedAt: active && Number.isFinite(saved.startedAt) ? saved.startedAt! : null,
     endsAt: active && Number.isFinite(saved.endsAt) ? saved.endsAt! : null,
-    ended: saved.ended && typeof saved.ended.by === "string" && Number.isFinite(saved.ended.at) ? {...saved.ended} : null
+    ended: saved.ended && typeof saved.ended.by === "string" && Number.isFinite(saved.ended.at) ? {...saved.ended} : null,
+    powerBelowSince: active && Number.isFinite(saved.powerBelowSince) ? saved.powerBelowSince! : null
   };
 }
 
@@ -150,7 +167,7 @@ export function transitionScene(
     for (const [area, targets] of rooms) lighting.push({lighting: {kind: "release", area, owner, targets, source: "scene"}});
     pause(false);
     trace("scene", "ended", null, {by, owner});
-    Object.assign(state, {active: false, owner: null, lights: [], startedAt: null, endsAt: null, ended: {by, at: now}});
+    Object.assign(state, {active: false, owner: null, lights: [], startedAt: null, endsAt: null, ended: {by, at: now}, powerBelowSince: null});
   }
 
   if (kind === "start") {
@@ -166,7 +183,8 @@ export function transitionScene(
         owner: config.owner,
         lights: config.lights.map(({area, target}) => ({area, target})),
         startedAt: now,
-        endsAt: config.safetyMs > 0 ? now + config.safetyMs : null
+        endsAt: config.safetyMs > 0 ? now + config.safetyMs : null,
+        powerBelowSince: null
       });
       for (const light of config.lights) {
         const values = {
@@ -182,11 +200,31 @@ export function transitionScene(
   } else if (kind === "end") {
     if (state.active) end(typeof event.by === "string" && event.by.trim() ? event.by.trim() : "request");
     else trace("scene", "ignored", "not-active");
+  } else if (kind === "power") {
+    const watts = Number(event.watts);
+    if (!state.active) {
+      trace("power", "ignored", "not-active");
+    } else if (config.endBelowWatts === null) {
+      trace("power", "ignored", "no-end-below");
+    } else if (!Number.isFinite(watts) || watts < 0) {
+      trace("power", "ignored", "not-watts");
+    } else if (watts >= config.endBelowWatts) {
+      if (state.powerBelowSince !== null) trace("power", "above", null, {watts});
+      state.powerBelowSince = null;
+    } else {
+      if (state.powerBelowSince === null) {
+        state.powerBelowSince = now;
+        trace("power", "below", null, {watts, endBelowWatts: config.endBelowWatts});
+      }
+      if (now - state.powerBelowSince >= config.endBelowMs) end("power");
+    }
   } else if (kind === "tick" || kind === "startup") {
     // Its timer, or the flows starting again (a redeploy or restart with a
     // context store): end it if its time is up, otherwise renew its pause.
     // Its lights are not asked again: the rooms still hold them.
     if (state.active && state.endsAt !== null && state.endsAt <= now) end("timer");
+    else if (state.active && state.powerBelowSince !== null && config.endBelowWatts !== null &&
+      now - state.powerBelowSince >= config.endBelowMs) end("power");
     else if (state.active) pause(true);
   } else {
     trace("input", "ignored", "not-a-scene-message");
@@ -205,8 +243,11 @@ export function transitionScene(
 
 // When it next needs a tick: its next renewal, or its safety timer's end if
 // sooner. Null when off.
-export function sceneTickAt(state: SceneState, now: number): number | null {
+export function sceneTickAt(state: SceneState, now: number, config?: Pick<SceneConfig, "endBelowMs">): number | null {
   if (!state.active) return null;
-  const renew = now + RENEW_MS;
-  return state.endsAt !== null ? Math.min(renew, state.endsAt) : renew;
+  const at = [now + RENEW_MS];
+  if (state.endsAt !== null) at.push(state.endsAt);
+  // When power held below its End below would end it.
+  if (state.powerBelowSince !== null && config) at.push(state.powerBelowSince + config.endBelowMs);
+  return Math.min(...at);
 }

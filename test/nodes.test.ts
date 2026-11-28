@@ -27,6 +27,7 @@ import registerShellySwitch from "../nodes/shelly-switch";
 import registerZ2mCover from "../nodes/z2m-cover";
 import registerWled from "../nodes/wled";
 import registerZ2mSensor from "../nodes/z2m-sensor";
+import registerZ2mPower from "../nodes/z2m-power";
 import registerApolloRPro1 from "../nodes/apollo-r-pro-1";
 import registerEverythingPresenceOne from "../nodes/everything-presence-one";
 import registerScene from "../nodes/scene";
@@ -851,6 +852,11 @@ test("display node: with no power meter host, it asks for the projector's power 
   await receive(node, {display: {kind: "observed", device: "projector", power: "standby", source: "plug"}});
   const state = savedState(node) as {observed: {projector: {power: string; watts: number | null; source: string}}};
   assert.deepEqual(state.observed.projector, {...state.observed.projector, power: "standby", watts: null, source: "plug"});
+  // A power meter node's reading request and reading: the query carries power: {kind: "read"}, and msg.power is the projector's power.
+  assert.deepEqual((queries[0] as {power?: unknown}).power, {kind: "read"});
+  await receive(node, {power: {kind: "observed", watts: 180, observedAt: new Date().toISOString()}});
+  const metered = savedState(node) as {observed: {projector: {power: string; watts: number | null}}};
+  assert.deepEqual([metered.observed.projector.watts, metered.observed.projector.power], [180, "on"]);
 });
 
 async function displayStartingProjector(t: {after(fn: () => void): void}) {
@@ -1532,6 +1538,27 @@ test("an Apollo R PRO-1 through a broker: its entities, a retained baseline whil
   const radar = (office.sent as Array<Array<Array<Record<string, unknown>> | null>>).flatMap(([occupancy]) => occupancy ?? []);
   assert.deepEqual(radar, [{source: "presence", payload: true}]);
   assert.match((office.statuses.at(-1) as {text: string}).text, /discovered/);
+});
+
+test("a zigbee2mqtt power node through a broker reads its plug on connect, and a scene ends on its power", async (t) => {
+  const broker = fakeBroker();
+  builtNodes.set("broker-power", broker);
+  const meter = new (runtime(registerZ2mPower).Constructor)({id: "study-power", baseTopic: "z2m", friendlyName: "study/socket", broker: "broker-power"});
+  const scene = new (runtime(registerScene).Constructor)({id: "scene-power", name: "Study", safetyHours: 0, lights: "[]", endBelowWatts: 20, endBelowSeconds: 0});
+  for (const node of [meter, scene]) t.after(() => close(node));
+  assert.deepEqual([meter.errors, scene.errors], [[], []]);
+  assert.deepEqual([...broker.subscriptions.keys()].sort(), ["z2m/study/socket", "z2m/study/socket/availability"]);
+  broker.connect();
+  assert.deepEqual(broker.published.map(({topic, payload}) => [topic, payload]), [["z2m/study/socket/get", "{\"power\":\"\"}"]]);
+  await receive(scene, {scene: {kind: "start"}});
+  broker.deliver("z2m/study/socket", "{\"power\":4.5,\"state\":\"ON\"}");
+  const readings = (meter.sent as Array<Array<Array<Record<string, unknown>>>>).flatMap(([out]) => out ?? []);
+  assert.deepEqual(readings.map(({power}) => (power as {watts: number}).watts), [4.5]);
+  for (const msg of readings) await receive(scene, msg);
+  assert.equal((scene.context().get("state") as {ended: {by: string}}).ended.by, "power");
+  const lonely = new (runtime(registerZ2mPower).Constructor)({id: "power-lonely", friendlyName: "x"});
+  t.after(() => close(lonely));
+  assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
 });
 
 test("every adapter shows the same badge for a configuration it cannot use, and logs why", () => {
