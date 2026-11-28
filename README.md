@@ -342,7 +342,7 @@ the checksum file to check those. Install a downloaded tarball through
 **Manage palette → Install → Upload module**, or with:
 
 ```sh
-npm install /path/to/avantics-node-red-home-automation-6.2.0.tgz
+npm install /path/to/avantics-node-red-home-automation-6.3.0.tgz
 ```
 
 Add the installed nodes from the **home automation** section of the Node-RED palette, then configure the room, device hosts, MQTT topics, source mappings, and timing limits for your deployment.
@@ -356,6 +356,54 @@ announces itself again every time the broker connects. A node's edit dialog
 offers the first broker in your flows. Nodes saved before 6.2 keep working
 through their MQTT in and out nodes until you choose one; the example flows
 use one broker node, "your MQTT broker", whose host you set.
+
+### 6.3.0
+
+Nothing to migrate from 6.2.0. New device nodes replace hand-wired MQTT in,
+change and function nodes for sensors, power meters and a WLED backlight, and
+the theatre now recovers its activity after a restart.
+
+**Sensors.** Each feeds occupancy fusion (motion and presence, output 1) and
+the motion lighting policy (light level in lux, output 2), sends only changes,
+and shows offline on its status:
+
+- **zigbee2mqtt sensor** (`home-z2m-sensor`), one per Zigbee2MQTT motion or
+  presence sensor, with an "Occupancy is" setting for presence-only devices. A
+  retained occupancy is never acted on.
+- **Everything Presence One** and **Apollo R PRO-1** (ESPHome), one node per
+  device. Each finds its sensors from the device's own MQTT discovery, so a
+  firmware rename can't break it, and falls back to known entity names
+  without it. Turn on `mqtt: discovery: true` in the device's ESPHome
+  configuration to use discovery.
+- **Occupancy fusion takes a start-up baseline** from the ESPHome nodes: a room
+  empty at start waits out its vacancy time, and an occupied one switches
+  nothing on.
+
+**Power.** A **zigbee2mqtt power** node (`home-z2m-power`) reports a plug's
+watts. The display controller takes it as the projector's power, and a scene's
+new **End below** setting ends the scene once the device has been used and
+then stays below the threshold for the set time.
+
+**WLED.** A **wled** node (`home-wled`) drives a WLED strip for the
+backlighting controller: on and off, and its brightness as the reading. WLED
+can't be asked for its state over MQTT, so after a restart its reading comes
+at its next change.
+
+**The theatre after a restart.** With nothing saved, the display, receiver,
+source and backlighting controllers now answer the activity controller's
+probe with what their devices show, and the theatre adopts the one activity
+that matches, commanding nothing. It needs the display and receiver to have
+answered; a device that can't be asked, such as a WLED backlight, shows as
+unobserved until it reports.
+
+Also changed:
+
+- A theatre light that never reports ends **unobserved** after the
+  confirmation timeout, leaving the theatre ready but degraded instead of
+  confirming forever, and a Zigbee2MQTT group with no state says to set
+  `retain: true` for it (#186).
+- Each device node's reference links to its maker's or project's
+  documentation.
 
 ### 6.2.0
 
