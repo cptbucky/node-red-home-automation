@@ -1914,10 +1914,17 @@ window.DOCS_SEARCH = [
  },
  {
   "title": "Everything Presence One",
-  "section": "What it reads",
+  "section": "How it finds its entities",
+  "description": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<co",
+  "url": "node-everything-presence-one.html#discovery",
+  "text": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<component>/<device>/<entity>/config , with its state topic and device class. The node takes binary sensors of class motion as motion, occupancy or presence as presence, and sensors of class illuminance as the light level, and subscribes to the state topics they name, so a firmware that renames an entity, or a custom topic prefix, still works. Where discovery and the entity names below differ, discovery wins, and the difference is traced. The model must match: the model in the device’s discovery must be the Everything Presence One. Another model’s discovery is ignored, and the status says so. Without discovery , the node uses the entity names below. To turn it on, set mqtt: discovery: true in the device’s ESPHome configuration (ESPHome’s default; some device configurations turn it off) and flash it again. The status ends with discovered or preset ."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "What it reads without discovery",
   "description": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary",
   "url": "node-everything-presence-one.html#entities",
-  "text": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary_sensor/mmwave The mmWave radar: sees someone sitting still, so occupancy fusion holds the room while they stay. Light level sensor/illuminance In lux. Its own occupancy entity isn’t read: it combines the PIR and radar on the device, and occupancy fusion does that combining here."
+  "text": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary_sensor/mmwave The mmWave radar: sees someone sitting still, so occupancy fusion holds the room while they stay. Light level sensor/illuminance In lux. Its own occupancy entity isn’t read, discovered or not: it combines the PIR and radar on the device, with its own off delay, and occupancy fusion does that combining here."
  },
  {
   "title": "Everything Presence One",
@@ -1938,7 +1945,7 @@ window.DOCS_SEARCH = [
   "section": "Settings",
   "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
   "url": "node-everything-presence-one.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s MQTT topic prefix: its ESPHome name unless set otherwise. It cannot contain + or # ."
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. It cannot contain + or # ."
  },
  {
   "title": "Everything Presence One",
@@ -1962,7 +1969,14 @@ window.DOCS_SEARCH = [
  },
  {
   "title": "Apollo R PRO-1",
-  "section": "What it reads",
+  "section": "How it finds its entities",
+  "description": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<co",
+  "url": "node-apollo-r-pro-1.html#discovery",
+  "text": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<component>/<device>/<entity>/config , with its state topic and device class. The node takes binary sensors of class motion as motion, occupancy or presence as presence, and sensors of class illuminance as the light level, and subscribes to the state topics they name, so a firmware that renames an entity, or a custom topic prefix, still works. Where discovery and the entity names below differ, discovery wins, and the difference is traced. The model must match: the model in the device’s discovery must be the Apollo R PRO-1. Another model’s discovery is ignored, and the status says so. Without discovery , the node uses the entity names below. To turn it on, set mqtt: discovery: true in the device’s ESPHome configuration (ESPHome’s default; some device configurations turn it off) and flash it again. The status ends with discovered or preset ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "What it reads without discovery",
   "description": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says ",
   "url": "node-apollo-r-pro-1.html#entities",
   "text": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says so, and off when every one that has reported says off. Apollo’s firmware has named the LD2450’s entities both ways: without a prefix ( presence , moving_target ) on earlier releases, and with ld2450_ on current ones. The node reads both, and an entity your firmware never publishes doesn’t count. Entities Role Entities What it is Motion binary_sensor/moving_target or binary_sensor/ld2450_moving_target , and binary_sensor/ld2412_moving_target A moving target, from either radar. Presence binary_sensor/presence or binary_sensor/ld2450_presence , and binary_sensor/ld2412_presence Anyone there, still or moving, from either radar. Light level sensor/ltr390_light The LTR390, in lux."
@@ -1986,7 +2000,7 @@ window.DOCS_SEARCH = [
   "section": "Settings",
   "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
   "url": "node-apollo-r-pro-1.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s MQTT topic prefix: its ESPHome name unless set otherwise. It cannot contain + or # ."
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. It cannot contain + or # ."
  },
  {
   "title": "Apollo R PRO-1",

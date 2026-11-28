@@ -336,6 +336,7 @@ test("each ESPHome device node needs a broker and its device name, has no model 
     const definition = editorDefinition(file);
     assert.deepEqual([definition.defaults.broker!.type, definition.defaults.broker!.required, definition.defaults.device!.value], ["mqtt-broker", true, ""], file);
     assert.equal(definition.defaults.model, undefined, `${file}: the model is the node's`);
+    assert.equal(definition.defaults.discoveryPrefix!.value, "homeassistant", file);
     const valid = (value: unknown) => definition.defaults.device!.validate!.call({}, value);
     assert.deepEqual([valid(""), valid("kitchen-sensor"), valid("a/#")], [false, true, false], file);
     assert.deepEqual([definition.outputs, definition.outputLabels],

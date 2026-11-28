@@ -8,6 +8,7 @@ import type {BrokerNode} from "./mqtt-broker-link";
 
 interface EsphomeSensorNodeConfig extends NodeDef {
   device?: string;
+  discoveryPrefix?: string;
   // Node-RED's mqtt-broker node, to subscribe itself.
   broker?: string;
 }
@@ -23,7 +24,7 @@ export function esphomeSensorNode(type: string, model: string): NodeInitializer 
       let device: EsphomeSensorConfig;
       let broker: BrokerNode | null;
       try {
-        device = normaliseEsphomeSensorConfig({device: config.device, model});
+        device = normaliseEsphomeSensorConfig({device: config.device, model, discoveryPrefix: config.discoveryPrefix});
         // Newer than the MQTT in and out way of wiring adapters: it needs its
         // broker.
         broker = deviceBroker(RED, config.broker);
@@ -35,15 +36,21 @@ export function esphomeSensorNode(type: string, model: string): NodeInitializer 
       const trace = {area: "", component: "esphome-sensor"};
       node.status({fill: "grey", shape: "ring", text: "waiting for the device"});
 
-      // Exactly its model's entities and its status. ESPHome retains them, so
-      // on connect the broker hands over the device's current state, which
-      // passes as a baseline while the device is online.
+      // Its discovery, its status and its preset's entities; then whatever its
+      // discovery names. ESPHome retains them, so on connect the broker hands
+      // over the device's description and current state, which passes as a
+      // baseline while the device is online.
       const topics = esphomeSensorTopics(device);
-      const side = deviceSide(node, broker, device.device, [topics.status, ...topics.binary, ...topics.illuminance], trace,
-        (msg, send) => handle(msg, send));
+      const subscribed = new Set(topics.initial);
+      const side = deviceSide(node, broker, device.device, topics.initial, trace, (msg, send) => handle(msg, send));
 
       function handle(msg: InputMessage, send: Send) {
         const result = runReducer(node, trace, (saved: Partial<EsphomeSensorState> | undefined) => transitionEsphomeSensor(saved, msg, device));
+        for (const topic of result.topics) {
+          if (subscribed.has(topic)) continue;
+          subscribed.add(topic);
+          side.subscribe(topic);
+        }
         // Output 1: motion and presence, for occupancy fusion. Output 2: the
         // light level, for the motion lighting policy.
         const outputs = [
@@ -57,8 +64,10 @@ export function esphomeSensorNode(type: string, model: string): NodeInitializer 
         } else {
           const occupied = state.motion === true || state.presence === true;
           const known = state.motion !== null || state.presence !== null;
-          const parts = [known ? (occupied ? "occupied" : "clear") : "", state.illuminance !== null ? `${state.illuminance} lx` : ""].filter(Boolean);
-          if (parts.length) node.status({fill: occupied ? "green" : "grey", shape: "dot", text: parts.join(" · ")});
+          // And where its entities came from: its discovery, or its preset.
+          const source = result.roles.source === "discovered" ? "discovered" : result.roles.source === "preset" ? "preset" : "preset: discovery is another model";
+          const parts = [known ? (occupied ? "occupied" : "clear") : "", state.illuminance !== null ? `${state.illuminance} lx` : "", source].filter(Boolean);
+          node.status({fill: occupied ? "green" : "grey", shape: known ? "dot" : "ring", text: parts.join(" · ")});
         }
       }
       onInput(node, (msg, send) => {

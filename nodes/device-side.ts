@@ -30,6 +30,9 @@ export interface DeviceSide {
   // Whether a message is one it now gets from the broker itself, ignored
   // with a trace; always false without a broker.
   fromBroker(msg: InputMessage): boolean;
+  // Subscribes to one more topic, as one learned after start (an ESPHome
+  // device's discovered state topics); nothing without a broker.
+  subscribe(topic: string): void;
 }
 
 // MQTT payloads as text: an object as JSON, as the broker node would.
@@ -58,17 +61,20 @@ export function deviceSide(
     return {
       broker: false,
       publish: (publications) => publications.length ? publications.map((publication) => ({...publication})) : null,
-      fromBroker: () => false
+      fromBroker: () => false,
+      subscribe: () => {}
     };
   }
   const link = brokerLink(broker, node.id, (error) => node.error(error));
-  for (const topic of subscriptions) {
+  const subscribe = (topic: string) => {
     link.subscribe(topic, (message) => handle({topic: message.topic, payload: message.payload, retain: message.retain} as InputMessage, node.send.bind(node)));
-  }
+  };
+  for (const topic of subscriptions) subscribe(topic);
   if (onConnected) link.onConnected(onConnected);
   node.on("close", (removed: boolean, done: () => void) => link.close(removed, done));
   return {
     broker: true,
+    subscribe,
     publish(publications) {
       for (const {topic, payload, retain} of publications) link.publish(topic, text(payload), {retain: retain === true});
       return null;
