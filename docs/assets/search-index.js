@@ -1910,7 +1910,7 @@ window.DOCS_SEARCH = [
   "section": "Everything Presence One, as the room takes it",
   "description": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “",
   "url": "node-everything-presence-one.html#summary",
-  "text": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “everything presence one”) turns an Everything Presence One’s PIR, mmWave radar and light sensor (Everything Smart Technology’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. Looking for wiring? Follow Motion and occupancy ."
+  "text": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “everything presence one”) turns an Everything Presence One’s PIR, mmWave radar and light sensor (Everything Smart Technology’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. The device: Everything Presence One (Everything Smart Technology’s documentation). Looking for wiring? Follow Motion and occupancy ."
  },
  {
   "title": "Everything Presence One",
@@ -1965,7 +1965,7 @@ window.DOCS_SEARCH = [
   "section": "Apollo R PRO-1, as the room takes it",
   "description": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) t",
   "url": "node-apollo-r-pro-1.html#summary",
-  "text": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) turns an Apollo R PRO-1’s two radars and light sensor (Apollo Automation’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. Looking for wiring? Follow Motion and occupancy ."
+  "text": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) turns an Apollo R PRO-1’s two radars and light sensor (Apollo Automation’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. The device: Apollo R PRO-1 (Apollo Automation’s documentation). Looking for wiring? Follow Motion and occupancy ."
  },
  {
   "title": "Apollo R PRO-1",
