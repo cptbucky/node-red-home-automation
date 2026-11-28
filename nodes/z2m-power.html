@@ -50,7 +50,7 @@
   <h3>Readings</h3>
   <ul>
     <li>Output: <code>msg.power = {kind: "observed", watts, observedAt}</code> (and <code>msg.payload</code> the watts),
-      from the plug's <code>power</code> only, and only when it changes.</li>
+      from the plug's <code>power</code> only, and only when it changes. A retained (old) report is never passed on.</li>
     <li>Input: <code>msg.power = {kind: "read"}</code> asks the plug for its power (<code>/get</code>), as it also does
       each time the broker connects. Plugs that don't answer report on their next change.</li>
     <li>Availability shows on the status (<i>offline</i>); nothing is sent for it.</li>

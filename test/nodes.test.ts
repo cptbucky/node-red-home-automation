@@ -1551,9 +1551,12 @@ test("a zigbee2mqtt power node through a broker reads its plug on connect, and a
   broker.connect();
   assert.deepEqual(broker.published.map(({topic, payload}) => [topic, payload]), [["z2m/study/socket/get", "{\"power\":\"\"}"]]);
   await receive(scene, {scene: {kind: "start"}});
+  // A retained old reading is ignored; the device used, then switched off.
+  broker.deliver("z2m/study/socket", "{\"power\":1.1,\"state\":\"ON\"}", true);
+  broker.deliver("z2m/study/socket", "{\"power\":150,\"state\":\"ON\"}");
   broker.deliver("z2m/study/socket", "{\"power\":4.5,\"state\":\"ON\"}");
   const readings = (meter.sent as Array<Array<Array<Record<string, unknown>>>>).flatMap(([out]) => out ?? []);
-  assert.deepEqual(readings.map(({power}) => (power as {watts: number}).watts), [4.5]);
+  assert.deepEqual(readings.map(({power}) => (power as {watts: number}).watts), [150, 4.5]);
   for (const msg of readings) await receive(scene, msg);
   assert.equal((scene.context().get("state") as {ended: {by: string}}).ended.by, "power");
   const lonely = new (runtime(registerZ2mPower).Constructor)({id: "power-lonely", friendlyName: "x"});

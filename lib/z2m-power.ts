@@ -33,6 +33,7 @@ export interface Z2mPowerState {
 export interface Z2mPowerMessage {
   topic?: unknown;
   payload?: unknown;
+  retain?: unknown;
   power?: unknown;
 }
 
@@ -89,7 +90,12 @@ export function transitionZ2mPower(
     if (!isObject(report)) throw new Error(`${topics.device} must carry the device's state object`);
     const watts = report.power;
     state.online = true;
-    if (typeof watts !== "number" || !Number.isFinite(watts) || watts < 0) {
+    if (msg.retain === true) {
+      // A retained report is an old one (with retain set for the plug in
+      // Zigbee2MQTT): never passed on; the read on connect brings a fresh
+      // one.
+      if (watts !== undefined) trace("power", "ignored", "retained", {value: watts});
+    } else if (typeof watts !== "number" || !Number.isFinite(watts) || watts < 0) {
       // A fixed contract: only watts pass. A report without power (or
       // nothing new) sends nothing.
       if (watts !== undefined) trace("power", "ignored", "not-watts", {value: watts});

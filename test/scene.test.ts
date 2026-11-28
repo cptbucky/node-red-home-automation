@@ -225,3 +225,23 @@ test("End below: power under it, held for its seconds while on, ends the scene b
   const none = run(exercise, run(exercise, undefined, {kind: "start"}, 0).state, {kind: "power", watts: 1}, 1);
   assert.deepEqual([none.state.active, none.traces[0]?.reason], [true, "no-end-below"]);
 });
+
+
+test("End below arms only once the device has been used: standby jitter before use never ends the scene", () => {
+  const plug = normaliseSceneConfig({owner: "scene:Exercise", lights: "[]", endBelowWatts: 20, endBelowSeconds: 60});
+  let result = run(plug, undefined, {kind: "start"}, 0);
+  // Idle: its standby draw wanders, below the threshold, for well over the hold.
+  for (const [seconds, watts] of [[10, 1.3], [40, 1.6], [100, 1.2]] as const) result = run(plug, result.state, {kind: "power", watts}, seconds);
+  result = run(plug, result.state, {kind: "tick"}, 300);
+  assert.deepEqual([result.state.active, result.state.powerUsed, result.state.powerBelowSince], [true, false, null]);
+  assert.equal(sceneTickAt(result.state, at(300), plug), at(300) + RENEW_MS, "no hold to wake for");
+  // Used, then low for the time: it ends.
+  result = run(plug, result.state, {kind: "power", watts: 180}, 400);
+  result = run(plug, result.state, {kind: "power", watts: 1.4}, 500);
+  result = run(plug, result.state, {kind: "tick"}, 560);
+  assert.deepEqual([result.state.active, result.state.ended?.by], [false, "power"]);
+  // A new start must be used again.
+  result = run(plug, result.state, {kind: "start"}, 600);
+  result = run(plug, result.state, {kind: "power", watts: 1.4}, 610);
+  assert.equal(run(plug, result.state, {kind: "tick"}, 700).state.active, true);
+});

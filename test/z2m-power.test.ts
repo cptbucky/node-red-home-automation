@@ -37,3 +37,11 @@ test("a read request asks the plug on /get; availability shows on the state only
   result = apply(result.state, {power: {kind: "observed", watts: 5}});
   assert.equal(result.traces[0]?.reason, "not-a-read-request");
 });
+
+test("a retained power reading (an old one after a restart) is never passed on, so it can't start a scene's countdown", () => {
+  let result = apply(undefined, {...report({power: 1.2}), retain: true}, 1);
+  assert.deepEqual([result.readings, result.traces[0]?.reason], [[], "retained"]);
+  // The fresh one that follows is passed on.
+  result = apply(result.state, report({power: 1.2}), 2);
+  assert.deepEqual(result.readings.map(({power}) => power.watts), [1.2]);
+});

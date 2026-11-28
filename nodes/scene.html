@@ -222,9 +222,10 @@
       <code>[{"area": "gym", "target": "main", "state": "OFF"}, {"area": "gym", "target": "tv", "state": "ON"}]</code>.</dd>
     <dt>Safety timer</dt><dd>Hours until it ends itself, so a forgotten scene doesn't hold the room: 4 by
       default; 0 turns it off.</dd>
-    <dt>End below</dt><dd>Optional: watts, and for how many seconds (60 by default). A power reading
-      (<code>msg.power</code>, from a power meter node on a device's plug) below it, held that long while the
-      scene is on, ends it <i>by power</i>; one at or above it starts the wait again. Empty: no power end.</dd>
+    <dt>End below</dt><dd>Optional: watts, and for how many seconds (60 by default). Once the device has been
+      used since the scene started (a power reading, <code>msg.power</code>, at or above it), a reading below it,
+      held that long, ends the scene <i>by power</i>; one at or above it starts the wait again. Before the device is
+      used, its standby draw is ignored. Empty: no power end.</dd>
     <dt>Area, Publish</dt><dd><i>Don't publish</i> unless chosen. <i>MQTT state</i>: its state and set topic, plain
       MQTT; <i>MQTT state and Home Assistant discovery</i>: also a switch entity for the scene
       that shows whether it is on and turns it on and off, on <code>home/&lt;area&gt;/scene/&lt;name&gt;/…</code>.</dd>

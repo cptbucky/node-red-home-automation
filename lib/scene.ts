@@ -52,8 +52,12 @@ export interface SceneState {
   endsAt: number | null;
   // How it last ended.
   ended: {by: string; at: number} | null;
-  // Since when the power has been below its End below, while it is on.
+  // Since when the power has been below its End below, while it is on,
+  // and whether the device has been used (at or above it) since the scene
+  // started: only then does a low reading count, so an idle device's
+  // standby draw before it is used never ends the scene.
   powerBelowSince: number | null;
+  powerUsed: boolean;
 }
 
 // What a flow sends it, on msg.scene.
@@ -130,7 +134,8 @@ export function createSceneState(saved: Partial<SceneState> = {}): SceneState {
     startedAt: active && Number.isFinite(saved.startedAt) ? saved.startedAt! : null,
     endsAt: active && Number.isFinite(saved.endsAt) ? saved.endsAt! : null,
     ended: saved.ended && typeof saved.ended.by === "string" && Number.isFinite(saved.ended.at) ? {...saved.ended} : null,
-    powerBelowSince: active && Number.isFinite(saved.powerBelowSince) ? saved.powerBelowSince! : null
+    powerBelowSince: active && Number.isFinite(saved.powerBelowSince) ? saved.powerBelowSince! : null,
+    powerUsed: active && saved.powerUsed === true
   };
 }
 
@@ -167,7 +172,7 @@ export function transitionScene(
     for (const [area, targets] of rooms) lighting.push({lighting: {kind: "release", area, owner, targets, source: "scene"}});
     pause(false);
     trace("scene", "ended", null, {by, owner});
-    Object.assign(state, {active: false, owner: null, lights: [], startedAt: null, endsAt: null, ended: {by, at: now}, powerBelowSince: null});
+    Object.assign(state, {active: false, owner: null, lights: [], startedAt: null, endsAt: null, ended: {by, at: now}, powerBelowSince: null, powerUsed: false});
   }
 
   if (kind === "start") {
@@ -184,7 +189,8 @@ export function transitionScene(
         lights: config.lights.map(({area, target}) => ({area, target})),
         startedAt: now,
         endsAt: config.safetyMs > 0 ? now + config.safetyMs : null,
-        powerBelowSince: null
+        powerBelowSince: null,
+        powerUsed: false
       });
       for (const light of config.lights) {
         const values = {
@@ -209,8 +215,13 @@ export function transitionScene(
     } else if (!Number.isFinite(watts) || watts < 0) {
       trace("power", "ignored", "not-watts");
     } else if (watts >= config.endBelowWatts) {
-      if (state.powerBelowSince !== null) trace("power", "above", null, {watts});
+      if (!state.powerUsed) trace("power", "used", null, {watts});
+      else if (state.powerBelowSince !== null) trace("power", "above", null, {watts});
+      state.powerUsed = true;
       state.powerBelowSince = null;
+    } else if (!state.powerUsed) {
+      // Not used yet since it started: a standby draw doesn't end it.
+      trace("power", "ignored", "not-used-yet", {watts});
     } else {
       if (state.powerBelowSince === null) {
         state.powerBelowSince = now;
