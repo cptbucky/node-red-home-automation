@@ -78,6 +78,7 @@
 <script type="text/html" data-help-name="home-z2m-light">
   <p>Connects one Zigbee2MQTT light, or a Zigbee2MQTT group of lights, to a <b>room lighting controller</b>, over
     Zigbee2MQTT's MQTT messages: no function nodes, and never Home Assistant. Use one per light in the room's targets.</p>
+  <p>The devices: <a href="https://www.zigbee2mqtt.io/supported-devices/" target="_blank">Zigbee2MQTT's supported devices</a>.</p>
   <h3>Wiring</h3>
   <p>With a <b>Broker</b>, it subscribes to <code>&lt;base&gt;/&lt;friendly name&gt;</code>, its <code>/set</code> and its <code>/availability</code> (exactly these: a friendly name can contain <code>/</code>) and publishes on its device's topics itself: leave out the MQTT
     in and MQTT out nodes below (still wired, they change nothing). Its first output then sends nothing. It reads its light on each connect (not a group, which Zigbee2MQTT can't be asked), as a Status node's startup did through the room. A node saved
