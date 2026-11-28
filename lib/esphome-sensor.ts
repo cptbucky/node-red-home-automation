@@ -24,7 +24,9 @@ export type SensorRole = "motion" | "presence" | "illuminance";
 export interface EsphomeModel {
   label: string;
   // Each role's entity names; several in one role count as one: on when
-  // any is on, off once every one is known and off.
+  // any that has reported is on, off when every one that has reported is
+  // off. One firmware may publish only some of them (an entity renamed in
+  // a later firmware), so one that never reports doesn't hold a role.
   motion: readonly string[];
   presence: readonly string[];
   illuminance: readonly string[];
@@ -41,9 +43,11 @@ export const ESPHOME_MODELS: Readonly<Record<string, EsphomeModel>> = {
   },
   "apollo-r-pro-1": {
     label: "Apollo R PRO-1",
-    // Its two radars, LD2450 and LD2412: a moving target is motion.
-    motion: ["moving_target", "ld2412_moving_target"],
-    presence: ["presence", "ld2412_presence"],
+    // Its two radars, LD2450 and LD2412: a moving target is motion. Its
+    // firmware has named the LD2450's entities both without a prefix
+    // (presence, moving_target) and, currently, with ld2450_.
+    motion: ["moving_target", "ld2450_moving_target", "ld2412_moving_target"],
+    presence: ["presence", "ld2450_presence", "ld2412_presence"],
     illuminance: ["ltr390_light"]
   }
 };
@@ -128,12 +132,12 @@ export function transitionEsphomeSensor(
     traces.push({event, outcome, reason, details});
   };
 
-  // A role's value from its entities: on when any is on, off once all are
-  // known and off, otherwise not known yet.
+  // A role's value from the entities that have reported: on when any is
+  // on, off when all are off, not known while none has reported.
   function roleValue(role: "motion" | "presence"): boolean | null {
-    const values = model[role].map((name) => state.entities[name]);
-    if (values.some((value) => value === true)) return true;
-    return values.every((value) => value === false) ? false : null;
+    const reported = model[role].map((name) => state.entities[name]).filter((value) => value !== undefined);
+    if (!reported.length) return null;
+    return reported.some((value) => value === true);
   }
 
   // Each occupancy role that changed, presence first: at a start, presence

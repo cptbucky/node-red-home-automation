@@ -1963,9 +1963,9 @@ window.DOCS_SEARCH = [
  {
   "title": "Apollo R PRO-1",
   "section": "What it reads",
-  "description": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when either radar says so, and off onc",
+  "description": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says ",
   "url": "node-apollo-r-pro-1.html#entities",
-  "text": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when either radar says so, and off once both have said off. Entities Role Entities What it is Motion binary_sensor/moving_target , binary_sensor/ld2412_moving_target A moving target, from either radar. Presence binary_sensor/presence , binary_sensor/ld2412_presence Anyone there, still or moving, from either radar. Light level sensor/ltr390_light The LTR390, in lux."
+  "text": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says so, and off when every one that has reported says off. Apollo’s firmware has named the LD2450’s entities both ways: without a prefix ( presence , moving_target ) on earlier releases, and with ld2450_ on current ones. The node reads both, and an entity your firmware never publishes doesn’t count. Entities Role Entities What it is Motion binary_sensor/moving_target or binary_sensor/ld2450_moving_target , and binary_sensor/ld2412_moving_target A moving target, from either radar. Presence binary_sensor/presence or binary_sensor/ld2450_presence , and binary_sensor/ld2412_presence Anyone there, still or moving, from either radar. Light level sensor/ltr390_light The LTR390, in lux."
  },
  {
   "title": "Apollo R PRO-1",

@@ -1500,6 +1500,7 @@ test("an Apollo R PRO-1 through a broker: its entities, a retained baseline whil
   assert.deepEqual(sensor.errors, []);
   assert.deepEqual([...broker.subscriptions.keys()].sort(), [
     "kitchen-sensor/binary_sensor/ld2412_moving_target/state", "kitchen-sensor/binary_sensor/ld2412_presence/state",
+    "kitchen-sensor/binary_sensor/ld2450_moving_target/state", "kitchen-sensor/binary_sensor/ld2450_presence/state",
     "kitchen-sensor/binary_sensor/moving_target/state", "kitchen-sensor/binary_sensor/presence/state",
     "kitchen-sensor/sensor/ltr390_light/state", "kitchen-sensor/status"]);
   broker.connect();

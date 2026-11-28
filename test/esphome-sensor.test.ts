@@ -38,10 +38,10 @@ test("Everything Presence One: pir is motion, mmwave presence, illuminance the l
   assert.deepEqual(result.occupancy, []);
 });
 
-test("Apollo R PRO-1: either radar is enough for on; off once both are off", () => {
+test("Apollo R PRO-1: either radar is enough for on; off once every radar that has reported is off", () => {
   let result = apply(undefined, status(apollo, "online"), apollo);
   result = apply(result.state, binary(apollo, "moving_target", "OFF"), apollo);
-  assert.deepEqual(result.occupancy, [], "the other radar not known yet");
+  assert.deepEqual(result.occupancy, [{source: "motion", payload: false}], "the radars that have reported");
   result = apply(result.state, binary(apollo, "ld2412_moving_target", "ON"), apollo);
   assert.deepEqual(result.occupancy, [{source: "motion", payload: true}]);
   result = apply(result.state, binary(apollo, "ld2412_moving_target", "OFF"), apollo);
@@ -127,4 +127,17 @@ test("a restart with someone there switches nothing on, and motion acts from its
   result = apply(result.state, binary(ep1, "mmwave", "OFF"));
   const left = transitionOccupancy(occupied.fusion, result.occupancy[0]!, {presenceMode: "hold"});
   assert.deepEqual(left.outputs.map(({payload}) => payload.occupied), [false]);
+});
+
+test("Apollo R PRO-1, both firmware namings: the room empties whichever the device publishes (ld2450_ or not)", () => {
+  for (const radar of ["", "ld2450_"]) {
+    let result = apply(undefined, status(apollo, "online"), apollo);
+    const sent: string[] = [];
+    for (const [entity, value] of [[`${radar}presence`, "ON"], [`${radar}moving_target`, "ON"], ["ld2412_presence", "ON"], ["ld2412_moving_target", "ON"],
+      [`${radar}presence`, "OFF"], [`${radar}moving_target`, "OFF"], ["ld2412_presence", "OFF"], ["ld2412_moving_target", "OFF"]] as const) {
+      result = apply(result.state, binary(apollo, entity, value), apollo);
+      sent.push(...result.occupancy.map(({source, payload}) => `${source}=${payload}`));
+    }
+    assert.deepEqual(sent, ["presence=true", "motion=true", "presence=false", "motion=false"], radar || "unprefixed");
+  }
 });

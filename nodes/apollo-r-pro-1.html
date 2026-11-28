@@ -42,13 +42,14 @@
   <p>Choose the <b>Broker</b> the device uses (MQTT on in its ESPHome configuration), and set <b>Device</b> to its ESPHome
     name, the prefix of its MQTT topics (such as <code>apollo-r-pro-1-1a2b3c</code>).</p>
   <h3>What it reads</h3>
-  <p>It has two radars, an LD2450 and an LD2412, and no PIR. Each role counts as on when either radar says so, and off
-    once both have said off.</p>
+  <p>It has two radars, an LD2450 and an LD2412, and no PIR. Each role counts as on when any radar that has reported
+    says so, and off when every one that has reported says off. Apollo's firmware has named the LD2450's entities
+    without a prefix on earlier releases and with <code>ld2450_</code> on current ones; the node reads both.</p>
   <ul>
-    <li><b>Motion</b>: <code>binary_sensor/moving_target</code> or <code>binary_sensor/ld2412_moving_target</code>: a
-      moving target.</li>
-    <li><b>Presence</b>: <code>binary_sensor/presence</code> or <code>binary_sensor/ld2412_presence</code>: anyone there,
-      still or moving.</li>
+    <li><b>Motion</b>: <code>binary_sensor/moving_target</code> (or <code>ld2450_moving_target</code>) and
+      <code>binary_sensor/ld2412_moving_target</code>: a moving target.</li>
+    <li><b>Presence</b>: <code>binary_sensor/presence</code> (or <code>ld2450_presence</code>) and
+      <code>binary_sensor/ld2412_presence</code>: anyone there, still or moving.</li>
     <li><b>Light level</b>: <code>sensor/ltr390_light</code>, the LTR390, in lux.</li>
   </ul>
   <h3>Readings</h3>
