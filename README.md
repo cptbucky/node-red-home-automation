@@ -87,7 +87,7 @@ restyle the light already shows.
 | `home-occupancy-fusion` | Combines PIR motion with optional presence sensing. |
 | `home-z2m-sensor` | Connects one Zigbee2MQTT motion, presence or light sensor: its occupancy and presence to occupancy fusion, its light level to the motion policy. |
 | `home-everything-presence-one`, `home-apollo-r-pro-1` | Connect those ESPHome presence sensors the same way, one node per device, finding their entities from the device's own MQTT discovery (or the node's preset without it); while the device is online, its retained state at a restart is the room's starting point. |
-| `home-motion-lighting-policy` | Converts occupancy and illuminance into lighting intent. A `delay` message (in seconds) or `illuminance-cut-off` message overrides its settings until they are changed and redeployed. |
+| `home-motion-lighting-policy` | Converts occupancy and illuminance into lighting intent. A `delay` message (in seconds) or `illuminance-cut-off` message overrides its settings until they are changed and redeployed. The house-wide `global-enabled` is deprecated and removed in 7.0: send `area-enabled` to each policy instead. |
 | `home-switch-lighting-policy` | Converts raw edges or pre-classified button actions into lighting intent while exposing input freshness and availability. |
 | `home-circadian-lighting-policy` | Styles rooms over the day: brightness and colour temperature from wake and bed times, sleep mode, and circadian and sleep switches for Home Assistant. |
 | `home-room-lighting-controller` | Owns the room's light commands, manual and held lights, and lighting state, and applies the style it is sent. |

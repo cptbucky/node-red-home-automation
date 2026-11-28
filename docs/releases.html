@@ -55,7 +55,9 @@
 <li><strong>Code that imports the package’s files directly</strong> now fails: only the nodes are a public interface. Installing and using the nodes is unchanged.</li>
 </ul>
 <h3>Deprecated, removed in the next major version</h3>
-<p>The 6.0.0 notes deprecate nothing.</p>
+<ul>
+<li><strong>The house-wide motion enable, <code>global-enabled</code>:</strong> a motion lighting policy still obeys it, and the policy that receives it shares it with every other through global context, but each policy now warns once per deploy and says so on its status. Send <code>area-enabled</code> (<code>true</code> or <code>false</code>) to each motion lighting policy instead. It is removed in 7.0.</li>
+</ul>
 <p>Details: the <a href="https://github.com/avantics-hq/node-red-home-automation#600">README’s 6.0.0 notes</a>.</p>
 </section>
 <section id="v5"><h2>Version 5</h2>
