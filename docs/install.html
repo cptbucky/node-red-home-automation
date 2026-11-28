@@ -20,9 +20,9 @@
 <p>The package declares what it needs in its <code>package.json</code>. Check both before you add it.</p>
 <div class="table-wrap" role="region" aria-label="Requirements; scroll horizontally on a phone" tabindex="0"><table><caption>Requirements</caption><thead><tr><th scope="col">Needs</th><th scope="col">Version</th><th scope="col">Declared in</th></tr></thead><tbody>
 <tr><td>Node-RED</td><td>5.0.0 or newer</td><td><code>node-red.version</code>: <code>&gt;=5.0.0</code></td></tr>
-<tr><td>Node.js</td><td>24 or newer</td><td><code>engines.node</code>: <code>&gt;=24</code></td></tr>
+<tr><td>Node.js</td><td>22.9 or newer</td><td><code>engines.node</code>: <code>&gt;=22.9</code>, as Node-RED 5’s own</td></tr>
 </tbody></table></div>
-<aside class="callout neutral"><strong>Node-RED 5 runs on older Node.js than this package.</strong><p>Node-RED 5 itself accepts Node.js 22.9, but this package needs Node.js 24 or newer. Check the Node.js version that runs your Node-RED before you add the package.</p></aside>
+<aside class="callout neutral"><strong>The same Node.js as Node-RED 5.</strong><p>The package runs on Node.js 22.9 or newer, as Node-RED 5 does. Releases 6.0.0 to 6.3.0 asked for 24.</p></aside>
 <p>For the nodes that talk to devices or publish state, you also need an MQTT broker and an <strong>MQTT broker</strong> config node in Node-RED. Home Assistant is optional: it is a panel that shows state and sends requests, never the path to a device.</p>
 </section>
 <section id="palette"><h2>Add it from the palette manager</h2>
