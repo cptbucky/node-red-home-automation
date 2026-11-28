@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import {normaliseEsphomeSensorConfig, transitionEsphomeSensor, type EsphomeSensorMessage, type EsphomeSensorState} from "../lib/esphome-sensor";
+import {esphomeSensorTopics, normaliseEsphomeSensorConfig, transitionEsphomeSensor, type EsphomeSensorMessage, type EsphomeSensorState} from "../lib/esphome-sensor";
 import {transitionOccupancy, type OccupancyState} from "../lib/occupancy-fusion";
 import {transitionMotion, type MotionEffect, type MotionState} from "../lib/motion-policy";
 
@@ -17,8 +17,9 @@ const sensor = (config: Config, entity: string, value: string, retain = false) =
   ({topic: `${config.device}/sensor/${entity}/state`, payload: value, retain});
 const status = (config: Config, value: string, retain = false) => ({topic: `${config.device}/status`, payload: value, retain});
 
-test("ESPHome sensor settings: a named model and the device's topic prefix, which has no default", () => {
-  assert.throws(() => normaliseEsphomeSensorConfig({model: "apollo-r-pro-1"}), /topic prefix is required/);
+test("ESPHome sensor settings: a named model and the device's name, which has no default; the discovery prefix defaults", () => {
+  assert.throws(() => normaliseEsphomeSensorConfig({model: "apollo-r-pro-1"}), /name is required/);
+  assert.equal(normaliseEsphomeSensorConfig({device: "a", model: "apollo-r-pro-1"}).discoveryPrefix, "homeassistant");
   assert.throws(() => normaliseEsphomeSensorConfig({device: "a", model: "custom"}), /unknown model/);
   assert.throws(() => normaliseEsphomeSensorConfig({device: "a/#", model: "apollo-r-pro-1"}), /\+ or #/);
 });
@@ -140,4 +141,87 @@ test("Apollo R PRO-1, both firmware namings: the room empties whichever the devi
     }
     assert.deepEqual(sent, ["presence=true", "motion=true", "presence=false", "motion=false"], radar || "unprefixed");
   }
+});
+
+// A discovery entry in Home Assistant's format, as ESPHome publishes it (abbreviated keys), written for these tests.
+const describe = (config: Config, component: string, object: string, deviceClass: string | null, model: string, stateTopic?: string) => ({
+  topic: `homeassistant/${component}/${config.device}/${object}/config`,
+  retain: true,
+  payload: JSON.stringify({name: object, ...(deviceClass ? {dev_cla: deviceClass} : {}),
+    stat_t: stateTopic ?? `${config.device}/${component}/${object}/state`, avty_t: `${config.device}/status`,
+    dev: {ids: "test", name: "Test", mdl: model}})
+});
+
+test("discovery first: the Everything Presence One's entities by device class, its combined occupancy left out", () => {
+  let result = apply(undefined, describe(ep1, "binary_sensor", "pir", "motion", "Everything Presence One"));
+  for (const entry of [describe(ep1, "binary_sensor", "mmwave", "occupancy", "Everything Presence One"),
+    describe(ep1, "binary_sensor", "occupancy", "occupancy", "Everything Presence One"),
+    describe(ep1, "sensor", "illuminance", "illuminance", "Everything Presence One"),
+    describe(ep1, "sensor", "temperature", "temperature", "Everything Presence One")]) {
+    result = apply(result.state, entry);
+  }
+  assert.deepEqual([result.roles.source, result.roles.motion, result.roles.presence, result.roles.illuminance],
+    ["discovered", ["office-sensor/binary_sensor/pir/state"], ["office-sensor/binary_sensor/mmwave/state"], ["office-sensor/sensor/illuminance/state"]]);
+  // The device's own occupancy isn't read.
+  result = apply(result.state, status(ep1, "online"));
+  result = apply(result.state, binary(ep1, "occupancy", "ON"));
+  assert.deepEqual(result.occupancy, []);
+});
+
+test("discovery first: a renamed entity is followed, and the difference from the preset is traced", () => {
+  let result = apply(undefined, describe(ep1, "binary_sensor", "pir", "motion", "Everything Presence One"));
+  result = apply(result.state, describe(ep1, "binary_sensor", "radar", "occupancy", "Everything Presence One"));
+  assert.ok(result.traces.some((entry) => entry.event === "roles" && entry.reason === "differs-from-preset"));
+  assert.ok(result.topics.includes("office-sensor/binary_sensor/radar/state"), "the node subscribes to it");
+  result = apply(result.state, status(ep1, "online"));
+  result = apply(result.state, binary(ep1, "radar", "ON"));
+  assert.deepEqual(result.occupancy, [{source: "presence", payload: true}]);
+  // The preset's name is no longer read.
+  result = apply(result.state, binary(ep1, "mmwave", "OFF"));
+  assert.deepEqual(result.occupancy, []);
+  // An entity removed from the device (an empty discovery entry).
+  result = apply(result.state, {topic: "homeassistant/binary_sensor/office-sensor/radar/config", payload: "", retain: true});
+  assert.ok(!result.roles.presence.includes("office-sensor/binary_sensor/radar/state"));
+});
+
+test("discovery first: the Apollo with discovery on (either radar naming), without it the preset, and another model's discovery the preset", () => {
+  assert.equal(apply(undefined, status(apollo, "online"), apollo).roles.source, "preset");
+  let result = apply(undefined, describe(apollo, "binary_sensor", "ld2450_presence", "occupancy", "R_PRO-1"), apollo);
+  for (const entry of [describe(apollo, "binary_sensor", "ld2412_presence", "occupancy", "R_PRO-1"),
+    describe(apollo, "binary_sensor", "ld2450_moving_target", "motion", "R_PRO-1"),
+    describe(apollo, "binary_sensor", "ld2412_moving_target", "motion", "R_PRO-1"),
+    describe(apollo, "sensor", "ltr390_light", "illuminance", "R_PRO-1")]) {
+    result = apply(result.state, entry, apollo);
+  }
+  assert.deepEqual([result.roles.source, result.roles.presence.length, result.roles.motion.length, result.roles.illuminance.length], ["discovered", 2, 2, 1]);
+  const other = apply(undefined, describe(apollo, "binary_sensor", "pir", "motion", "Everything Presence One"), apollo);
+  assert.equal(other.roles.source, "preset-other-model");
+  // As the node starts: the discovery topic and the preset's topics.
+  assert.ok(esphomeSensorTopics(apollo).initial.includes("homeassistant/+/kitchen-sensor/+/config"));
+});
+
+test("discovery first: an Apollo-shaped set, with both radars, still targets as presence, a disabled light sensor and a running entity", () => {
+  // Written from the discovery format for this test; dev.mdl as the device names its model.
+  const entry = (component: string, object: string, deviceClass: string | null, extra: Record<string, unknown> = {}) => ({
+    topic: `homeassistant/${component}/${apollo.device}/${object}/config`, retain: true,
+    payload: JSON.stringify({name: object, ...(deviceClass ? {dev_cla: deviceClass} : {}), stat_t: `${apollo.device}/${component}/${object}/state`,
+      avty_t: `${apollo.device}/status`, dev: {ids: "test", mdl: "R-PRO-1-ETH"}, ...extra})
+  });
+  let result = apply(undefined, entry("binary_sensor", "moving_target", "motion"), apollo);
+  for (const each of [entry("binary_sensor", "ld2412_moving_target", "motion"), entry("binary_sensor", "presence", "occupancy"),
+    entry("binary_sensor", "still_target", "occupancy"), entry("binary_sensor", "ld2412_presence", "occupancy"),
+    entry("binary_sensor", "ld2412_still_target", "occupancy"), entry("sensor", "ltr390_light", "illuminance"),
+    entry("sensor", "ld2412_light", "illuminance", {en: false}), entry("binary_sensor", "radar_running", "running")]) {
+    result = apply(result.state, each, apollo);
+  }
+  const names = (topics: string[]) => topics.map((topic) => topic.split("/").at(-2)).sort();
+  assert.equal(result.roles.source, "discovered");
+  assert.deepEqual(names(result.roles.motion), ["ld2412_moving_target", "moving_target"]);
+  assert.deepEqual(names(result.roles.presence), ["ld2412_presence", "ld2412_still_target", "presence", "still_target"]);
+  assert.deepEqual(names(result.roles.illuminance), ["ltr390_light"], "the disabled LD2412 light isn't read");
+  assert.ok(!result.topics.some((topic) => topic.includes("ld2412_light") || topic.includes("radar_running")));
+  // An entity disabled later is dropped.
+  result = apply(result.state, entry("binary_sensor", "still_target", "occupancy", {en: false}), apollo);
+  assert.ok(!names(result.roles.presence).includes("still_target"));
+  assert.equal(result.traces[0]?.reason, "disabled");
 });

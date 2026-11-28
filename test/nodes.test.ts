@@ -1499,6 +1499,7 @@ test("an Apollo R PRO-1 through a broker: its entities, a retained baseline whil
   t.after(() => close(sensor));
   assert.deepEqual(sensor.errors, []);
   assert.deepEqual([...broker.subscriptions.keys()].sort(), [
+    "homeassistant/+/kitchen-sensor/+/config",
     "kitchen-sensor/binary_sensor/ld2412_moving_target/state", "kitchen-sensor/binary_sensor/ld2412_presence/state",
     "kitchen-sensor/binary_sensor/ld2450_moving_target/state", "kitchen-sensor/binary_sensor/ld2450_presence/state",
     "kitchen-sensor/binary_sensor/moving_target/state", "kitchen-sensor/binary_sensor/presence/state",
@@ -1521,6 +1522,16 @@ test("an Apollo R PRO-1 through a broker: its entities, a retained baseline whil
   t.after(() => close(office));
   assert.deepEqual([...broker.subscriptions.keys()].filter((topic) => topic.startsWith("office-sensor/")).sort(), [
     "office-sensor/binary_sensor/mmwave/state", "office-sensor/binary_sensor/pir/state", "office-sensor/sensor/illuminance/state", "office-sensor/status"]);
+  // Its discovery names a renamed radar entity: the node subscribes to it, and its readings pass.
+  office.sent.length = 0;
+  broker.deliver("homeassistant/binary_sensor/office-sensor/radar/config",
+    JSON.stringify({name: "Radar", dev_cla: "occupancy", stat_t: "office-sensor/binary_sensor/radar/state", dev: {mdl: "Everything Presence One"}}), true);
+  assert.ok(broker.subscriptions.has("office-sensor/binary_sensor/radar/state"));
+  broker.deliver("office-sensor/status", "online", true);
+  broker.deliver("office-sensor/binary_sensor/radar/state", "ON");
+  const radar = (office.sent as Array<Array<Array<Record<string, unknown>> | null>>).flatMap(([occupancy]) => occupancy ?? []);
+  assert.deepEqual(radar, [{source: "presence", payload: true}]);
+  assert.match((office.statuses.at(-1) as {text: string}).text, /discovered/);
 });
 
 test("every adapter shows the same badge for a configuration it cannot use, and logs why", () => {

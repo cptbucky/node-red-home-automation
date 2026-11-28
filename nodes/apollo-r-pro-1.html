@@ -12,6 +12,13 @@
       device: {value: "", required: true, validate: function (v) {
         var device = String(v || "").trim().replace(/^\/+|\/+$/g, "");
         return device !== "" && !/[+#]/.test(device);
+      }},
+      // Where the device's discovery is: ESPHome's default. A node saved
+      // before this setting loads without it (the editor applies no defaults
+      // to deployed flows); missing or empty means homeassistant, as the
+      // runtime reads it.
+      discoveryPrefix: {value: "homeassistant", validate: function (v) {
+        return !/[+#]/.test(String(v === undefined || v === null ? "" : v));
       }}
     },
     inputs: 1,
@@ -26,7 +33,8 @@
 <script type="text/html" data-template-name="home-apollo-r-pro-1">
   <div class="form-row"><label for="node-input-name">Name</label><input type="text" id="node-input-name"></div>
   <div class="form-row"><label for="node-input-broker">Broker</label><input type="text" id="node-input-broker"></div>
-  <div class="form-row"><label for="node-input-device">Device</label><input type="text" id="node-input-device" placeholder="its ESPHome name (topic prefix)"></div>
+  <div class="form-row"><label for="node-input-device">Device</label><input type="text" id="node-input-device" placeholder="its ESPHome name"></div>
+  <div class="form-row"><label for="node-input-discoveryPrefix">Discovery prefix</label><input type="text" id="node-input-discoveryPrefix"></div>
   <div class="form-tips">It subscribes to the device's entities and status itself: no MQTT in, change or function nodes.</div>
 </script>
 
@@ -34,6 +42,7 @@
   <p>Connects an <b>Apollo R PRO-1</b> (Apollo Automation's ESPHome presence sensor) to a room: its two radars and its
     light sensor become the messages <b>home occupancy fusion</b> and the <b>home motion lighting policy</b> take, over
     ESPHome's own MQTT messages: no function or change nodes, and never Home Assistant.</p>
+  <p>The device: <a href="https://wiki.apolloautomation.com/products/rpro1/introduction/" target="_blank">Apollo R PRO-1</a> (Apollo Automation's documentation).</p>
   <h3>Wiring</h3>
   <ol>
     <li>Output 1 (motion and presence) → occupancy fusion, with its presence sensor set to hold.</li>
@@ -52,6 +61,12 @@
       <code>binary_sensor/ld2412_presence</code>: anyone there, still or moving.</li>
     <li><b>Light level</b>: <code>sensor/ltr390_light</code>, the LTR390, in lux.</li>
   </ul>
+  <h3>How it finds its entities</h3>
+  <p>From the device's own MQTT discovery first: each entity it describes, by device class (motion; occupancy or
+    presence; illuminance), with its state topic, skipping those it marks disabled by default, so a firmware that renames an entity still works. The device's model
+    in its discovery must be this one. Without discovery (turn it on with <code>mqtt: discovery: true</code> in the
+    device's ESPHome configuration and flash it again), or with another model's, it uses the entity names below. Its
+    status ends with <i>discovered</i> or <i>preset</i>.</p>
   <h3>Readings</h3>
   <ul>
     <li>Output 1: <code>{source: "motion" | "presence", payload: true | false}</code>, from ON and OFF only.</li>
