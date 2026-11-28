@@ -27,7 +27,8 @@ import registerShellySwitch from "../nodes/shelly-switch";
 import registerZ2mCover from "../nodes/z2m-cover";
 import registerWled from "../nodes/wled";
 import registerZ2mSensor from "../nodes/z2m-sensor";
-import registerEsphomeSensor from "../nodes/esphome-sensor";
+import registerApolloRPro1 from "../nodes/apollo-r-pro-1";
+import registerEverythingPresenceOne from "../nodes/everything-presence-one";
 import registerScene from "../nodes/scene";
 import {fakeBroker} from "./helpers/fake-broker";
 import type {SharedSchedule} from "../lib/house-schedule";
@@ -1491,10 +1492,10 @@ test("a zigbee2mqtt sensor through a broker: occupancy fusion hears its motion, 
   assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
 });
 
-test("an esphome sensor through a broker: its model's entities, a retained baseline while online, and nothing published", async (t) => {
+test("an Apollo R PRO-1 through a broker: its entities, a retained baseline while online, and nothing published", async (t) => {
   const broker = fakeBroker();
   builtNodes.set("broker-esphome", broker);
-  const sensor = new (runtime(registerEsphomeSensor).Constructor)({id: "kitchen-sensor", device: "kitchen-sensor", model: "apollo-r-pro-1", broker: "broker-esphome"});
+  const sensor = new (runtime(registerApolloRPro1).Constructor)({id: "kitchen-sensor", device: "kitchen-sensor", broker: "broker-esphome"});
   t.after(() => close(sensor));
   assert.deepEqual(sensor.errors, []);
   assert.deepEqual([...broker.subscriptions.keys()].sort(), [
@@ -1511,9 +1512,14 @@ test("an esphome sensor through a broker: its model's entities, a retained basel
   const outputs = (sensor.sent as Array<Array<Array<Record<string, unknown>> | null>>).flatMap(([occupancy]) => occupancy ?? []);
   assert.deepEqual(outputs, [{source: "presence", payload: true, baseline: true}, {source: "motion", payload: false, baseline: true}]);
   assert.deepEqual(broker.published, []);
-  const lonely = new (runtime(registerEsphomeSensor).Constructor)({id: "esphome-lonely", device: "x", model: "apollo-r-pro-1"});
+  const lonely = new (runtime(registerApolloRPro1).Constructor)({id: "esphome-lonely", device: "x"});
   t.after(() => close(lonely));
   assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
+  // The Everything Presence One: its own entities.
+  const office = new (runtime(registerEverythingPresenceOne).Constructor)({id: "office-sensor", device: "office-sensor", broker: "broker-esphome"});
+  t.after(() => close(office));
+  assert.deepEqual([...broker.subscriptions.keys()].filter((topic) => topic.startsWith("office-sensor/")).sort(), [
+    "office-sensor/binary_sensor/mmwave/state", "office-sensor/binary_sensor/pir/state", "office-sensor/sensor/illuminance/state", "office-sensor/status"]);
 });
 
 test("every adapter shows the same badge for a configuration it cannot use, and logs why", () => {

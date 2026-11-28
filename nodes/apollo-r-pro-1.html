@@ -1,0 +1,64 @@
+<script type="text/javascript">
+  RED.nodes.registerType("home-apollo-r-pro-1", {
+    category: "home automation",
+    color: "#e2d96e",
+    defaults: {
+      name: {value: ""},
+      // Node-RED's MQTT broker node, through which it subscribes to the
+      // device's topics. The editor offers the first broker when the dialog is
+      // opened and saved.
+      broker: {value: "", type: "mqtt-broker", required: true},
+      // No default: it names the user's own device.
+      device: {value: "", required: true, validate: function (v) {
+        var device = String(v || "").trim().replace(/^\/+|\/+$/g, "");
+        return device !== "" && !/[+#]/.test(device);
+      }}
+    },
+    inputs: 1,
+    outputs: 2,
+    outputLabels: ["motion and presence, to occupancy fusion", "light level, to the motion lighting policy"],
+    icon: "font-awesome/fa-eye",
+    label: function () { return this.name || this.device || "apollo r pro-1"; },
+    paletteLabel: "apollo r pro-1"
+  });
+</script>
+
+<script type="text/html" data-template-name="home-apollo-r-pro-1">
+  <div class="form-row"><label for="node-input-name">Name</label><input type="text" id="node-input-name"></div>
+  <div class="form-row"><label for="node-input-broker">Broker</label><input type="text" id="node-input-broker"></div>
+  <div class="form-row"><label for="node-input-device">Device</label><input type="text" id="node-input-device" placeholder="its ESPHome name (topic prefix)"></div>
+  <div class="form-tips">It subscribes to the device's entities and status itself: no MQTT in, change or function nodes.</div>
+</script>
+
+<script type="text/html" data-help-name="home-apollo-r-pro-1">
+  <p>Connects an <b>Apollo R PRO-1</b> (Apollo Automation's ESPHome presence sensor) to a room: its two radars and its
+    light sensor become the messages <b>home occupancy fusion</b> and the <b>home motion lighting policy</b> take, over
+    ESPHome's own MQTT messages: no function or change nodes, and never Home Assistant.</p>
+  <h3>Wiring</h3>
+  <ol>
+    <li>Output 1 (motion and presence) → occupancy fusion, with its presence sensor set to hold.</li>
+    <li>Output 2 (light level) → the motion lighting policy.</li>
+  </ol>
+  <p>Choose the <b>Broker</b> the device uses (MQTT on in its ESPHome configuration), and set <b>Device</b> to its ESPHome
+    name, the prefix of its MQTT topics (such as <code>apollo-r-pro-1-1a2b3c</code>).</p>
+  <h3>What it reads</h3>
+  <p>It has two radars, an LD2450 and an LD2412, and no PIR. Each role counts as on when either radar says so, and off
+    once both have said off.</p>
+  <ul>
+    <li><b>Motion</b>: <code>binary_sensor/moving_target</code> or <code>binary_sensor/ld2412_moving_target</code>: a
+      moving target.</li>
+    <li><b>Presence</b>: <code>binary_sensor/presence</code> or <code>binary_sensor/ld2412_presence</code>: anyone there,
+      still or moving.</li>
+    <li><b>Light level</b>: <code>sensor/ltr390_light</code>, the LTR390, in lux.</li>
+  </ul>
+  <h3>Readings</h3>
+  <ul>
+    <li>Output 1: <code>{source: "motion" | "presence", payload: true | false}</code>, from ON and OFF only.</li>
+    <li>Output 2: <code>{source: "illuminance", payload: &lt;lux&gt;}</code>, from a number only.</li>
+    <li>Anything else (such as <code>nan</code>) is ignored with a trace, and only a change is sent.</li>
+    <li>As Node-RED starts, ESPHome's retained states are the device's current ones while its status is online. They
+      are sent with <code>msg.baseline = true</code>: an occupied room switches nothing on, and an empty one starts its
+      vacancy, so its lights go off when the motion policy's delay runs out. A retained state from a device that isn't
+      online is ignored.</li>
+  </ul>
+</script>

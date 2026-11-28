@@ -1,0 +1,32 @@
+<!--{
+ "title": "Apollo R PRO-1",
+ "lead": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy.",
+ "description": "",
+ "htmlTitle": "Apollo R PRO-1 · Node-RED Home Automation",
+ "node": "home-apollo-r-pro-1"
+}-->
+<div class="meta"><span class="tag"><code>home-apollo-r-pro-1</code></span><span class="tag">1 input · 2 outputs</span><span class="tag">home automation</span></div>
+<section id="summary"><h2>Apollo R PRO-1, as the room takes it</h2>
+<p>The <strong>apollo r pro-1</strong> node (type <code>home-apollo-r-pro-1</code>; canvas label: its name, its device, or “apollo r pro-1”) turns an Apollo R PRO-1’s two radars and light sensor (Apollo Automation’s ESPHome presence sensor) into the messages <a href="node-occupancy-fusion.html">occupancy fusion</a> and the <a href="node-motion-policy.html">motion lighting policy</a> take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node.</p>
+<aside class="callout neutral"><strong>Looking for wiring?</strong><p>Follow <a href="guide-motion-occupancy.html">Motion and occupancy</a>.</p></aside>
+</section>
+<section id="entities"><h2>What it reads</h2>
+<p>It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when either radar says so, and off once both have said off.</p>
+<div class="table-wrap" role="region" aria-label="Entities; scroll horizontally on a phone" tabindex="0"><table><caption>Entities</caption><thead><tr><th scope="col">Role</th><th scope="col">Entities</th><th scope="col">What it is</th></tr></thead><tbody><tr><td>Motion</td><td><code>binary_sensor/moving_target</code>, <code>binary_sensor/ld2412_moving_target</code></td><td>A moving target, from either radar.</td></tr><tr><td>Presence</td><td><code>binary_sensor/presence</code>, <code>binary_sensor/ld2412_presence</code></td><td>Anyone there, still or moving, from either radar.</td></tr><tr><td>Light level</td><td><code>sensor/ltr390_light</code></td><td>The LTR390, in lux.</td></tr></tbody></table></div>
+</section>
+
+<section id="inputs"><h2>Inputs</h2>
+<div class="table-wrap" role="region" aria-label="Input messages; scroll horizontally on a phone" tabindex="0"><table><caption>Input messages</caption><thead><tr><th scope="col">From</th><th scope="col">Topic</th><th scope="col">Effect</th></tr></thead><tbody><tr><td>The broker</td><td><code>&lt;device&gt;/binary_sensor/&lt;entity&gt;/state</code>: <code>ON</code> or <code>OFF</code></td><td>Motion and presence, as below.</td></tr><tr><td>The broker</td><td><code>&lt;device&gt;/sensor/&lt;entity&gt;/state</code>: a number</td><td>The light level.</td></tr><tr><td>The broker</td><td><code>&lt;device&gt;/status</code>: <code>online</code> or <code>offline</code></td><td>Shown on the status; decides whether retained states count.</td></tr></tbody></table></div>
+<p>An MQTT in node wired to its input changes nothing.</p>
+</section>
+<section id="outputs"><h2>Outputs</h2>
+<div class="table-wrap" role="region" aria-label="Two output ports; scroll horizontally on a phone" tabindex="0"><table><caption>Two output ports</caption><thead><tr><th scope="col">Port</th><th scope="col">Message</th><th scope="col">Connect to</th></tr></thead><tbody><tr><td>1 · Motion and presence</td><td><code>{source: "motion" | "presence", payload: true | false}</code>, with <code>baseline: true</code> at a start</td><td>Occupancy fusion’s input.</td></tr><tr><td>2 · Light level</td><td><code>{source: "illuminance", payload: &lt;lux&gt;}</code></td><td>The motion lighting policy’s input.</td></tr></tbody></table></div>
+<p>These are fixed: output 1 carries only booleans from <code>ON</code> and <code>OFF</code>, output 2 only a number. Anything else, such as <code>nan</code>, is ignored with a trace and never passed on. Only a change is sent.</p>
+</section>
+<section id="settings"><h2>Settings</h2>
+<div class="table-wrap" role="region" aria-label="Editor settings and exact defaults; scroll horizontally on a phone" tabindex="0"><table><caption>Editor settings and exact defaults</caption><thead><tr><th scope="col">Setting / property</th><th scope="col">Default</th><th scope="col">Meaning</th></tr></thead><tbody><tr><td>Name<span class="field">name · string</span></td><td>Empty</td><td>Display label.</td></tr><tr><td>Broker<span class="field">broker · mqtt-broker</span></td><td>None</td><td>Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <code>&lt;device&gt;/status</code>.</td></tr><tr><td>Device<span class="field">device · string</span></td><td>Empty</td><td>Required. The device’s MQTT topic prefix: its ESPHome name unless set otherwise. It cannot contain <code>+</code> or <code>#</code>.</td></tr></tbody></table></div>
+</section>
+<section id="restart"><h2>As Node-RED starts</h2>
+<p>ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is <code>online</code>, they are its current state, and the node passes motion and presence on with <code>baseline: true</code> (presence first):</p>
+<ul class="rule-list"><li><strong>Someone there:</strong> occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change.</li><li><strong>Room empty:</strong> fusion sends <code>occupied: false</code>, so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out.</li><li><strong>Device not online:</strong> its retained states are ignored. States that arrive before its status are held until it says <code>online</code>.</li></ul>
+</section>

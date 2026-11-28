@@ -135,7 +135,8 @@ return msg;</code></pre></div>
 <div class="card"><h3>zigbee2mqtt light</h3><p>A Zigbee light or group paired with Zigbee2MQTT, for a room lighting controller. It subscribes to the light’s state, <code>/set</code> and availability.</p></div>
 <div class="card"><h3>shelly switch</h3><p>A Gen2-or-later relay behind a wall switch: in detached mode, the switch’s presses for the switch policy; otherwise, the relay as the light. It subscribes to <code>&lt;prefix&gt;/#</code>.</p></div>
 <div class="card"><h3>zigbee2mqtt sensor</h3><p>A Zigbee motion, presence or light sensor paired with Zigbee2MQTT, for a room’s occupancy fusion and motion lighting policy. It subscribes to the device topic and its availability.</p></div>
-<div class="card"><h3>esphome sensor</h3><p>An ESPHome presence sensor of a named model (Everything Presence One, Apollo R PRO-1), for a room’s occupancy fusion and motion lighting policy. It subscribes to its model’s entities and the device’s status.</p></div>
+<div class="card"><h3>everything presence one</h3><p>An Everything Presence One (ESPHome), for a room’s occupancy fusion and motion lighting policy: its PIR, mmWave radar and light sensor.</p></div>
+<div class="card"><h3>apollo r pro-1</h3><p>An Apollo R PRO-1 (ESPHome), for a room’s occupancy fusion and motion lighting policy: its two radars and its light sensor.</p></div>
 <div class="card"><h3>wled</h3><p>A WLED strip as a TV backlight, for a backlighting controller: on and off. It subscribes to its device topic’s <code>/g</code> and <code>/status</code>.</p></div>
 </div>
 <p>For any other device, the controller’s neutral commands and readings are the contract to map to; for a light, the room’s <a href="node-room-controller.html#light-contract">neutral light contract</a>.</p>

@@ -331,14 +331,16 @@ test("the shelly switch adapter has no default device, a mode as the device is s
   assert.equal(definition.defaults.target!.value, "", "not a room light unless set");
 });
 
-test("the esphome sensor needs a broker, its device and a named model, and labels its two outputs", () => {
-  const definition = editorDefinition("esphome-sensor.html");
-  assert.deepEqual([definition.defaults.broker!.type, definition.defaults.broker!.required, definition.defaults.device!.value, definition.defaults.model!.value],
-    ["mqtt-broker", true, "", ""]);
-  const valid = (key: string, value: unknown) => definition.defaults[key]!.validate!.call({}, value);
-  assert.deepEqual([valid("model", "everything-presence-one"), valid("model", "apollo-r-pro-1"), valid("model", "custom"), valid("device", ""), valid("device", "kitchen-sensor")],
-    [true, true, false, false, true]);
-  assert.deepEqual(definition.outputs, 2);
+test("each ESPHome device node needs a broker and its device name, has no model setting, and labels its two outputs", () => {
+  for (const file of ["everything-presence-one.html", "apollo-r-pro-1.html"]) {
+    const definition = editorDefinition(file);
+    assert.deepEqual([definition.defaults.broker!.type, definition.defaults.broker!.required, definition.defaults.device!.value], ["mqtt-broker", true, ""], file);
+    assert.equal(definition.defaults.model, undefined, `${file}: the model is the node's`);
+    const valid = (value: unknown) => definition.defaults.device!.validate!.call({}, value);
+    assert.deepEqual([valid(""), valid("kitchen-sensor"), valid("a/#")], [false, true, false], file);
+    assert.deepEqual([definition.outputs, definition.outputLabels],
+      [2, ["motion and presence, to occupancy fusion", "light level, to the motion lighting policy"]], file);
+  }
 });
 
 test("the zigbee2mqtt sensor needs a broker and its device, defaults occupancy to motion, and labels its two outputs", () => {
