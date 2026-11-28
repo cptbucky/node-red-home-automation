@@ -34,8 +34,18 @@ commands, and reports done only when fresh observations confirm them.
 
 ## Included nodes
 
-The nodes come in five groups. Each group has an importable example flow
-(**Import → Examples** in the Node-RED editor).
+In the editor's palette the nodes sit in five categories, by kind:
+
+| Palette category | Nodes (palette label: type) |
+|---|---|
+| home devices | zigbee2mqtt light: `home-z2m-light`; zigbee2mqtt cover: `home-z2m-cover`; zigbee2mqtt sensor: `home-z2m-sensor`; zigbee2mqtt power: `home-z2m-power`; shelly switch: `home-shelly-switch`; shelly cover: `home-shelly-cover`; wled: `home-wled`; everything presence one: `home-everything-presence-one`; apollo r pro-1: `home-apollo-r-pro-1` |
+| home lighting | room lighting: `home-room-lighting-controller`; occupancy: `home-occupancy-fusion`; motion policy: `home-motion-lighting-policy`; switch policy: `home-switch-lighting-policy`; circadian policy: `home-circadian-lighting-policy`; scene: `home-scene` |
+| home covers | cover: `home-cover-controller`; cover group: `home-cover-group` |
+| home theatre | theatre activity: `home-theatre-activity-controller`; theatre contract: `home-theatre-state-contract`; display: `home-display-mode-controller`; receiver: `home-avr-controller`; source: `home-source-capability-controller`; backlighting: `home-backlighting-controller`; activity lighting: `home-activity-lighting-controller` |
+| home house | `home-house-schedule` (its configuration node); house schedule mqtt: `home-house-schedule-mqtt` |
+
+Below, they come in five groups by what they do together. Each group has an
+importable example flow (**Import → Examples** in the Node-RED editor).
 
 ### Room lighting
 

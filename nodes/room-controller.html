@@ -98,7 +98,8 @@
       return imported.nodes.filter(function (n) { return n.type === "home-z2m-light"; }).length;
     }
     RED.nodes.registerType("home-room-lighting-controller", {
-      category: "home automation",
+      category: "home lighting",
+      paletteLabel: "room lighting",
       color: "#ffd27f",
       defaults: {
         // A marker only a node new from the palette has, as core nodes do: import

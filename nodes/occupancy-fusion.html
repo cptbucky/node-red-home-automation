@@ -27,7 +27,8 @@
       return publishChoice(node) !== "off" || (saved && (on(node.publishState) || on(node.discovery)));
     }
     RED.nodes.registerType("home-occupancy-fusion", {
-      category: "home automation",
+      category: "home lighting",
+      paletteLabel: "occupancy",
       color: "#c7e9c0",
       defaults: {
         // A marker only a node new from the palette has, as core nodes do: import

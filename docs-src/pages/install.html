@@ -18,7 +18,7 @@
 <ol class="step-list">
 <li><strong>Open the palette manager.</strong><p>In the Node-RED editor, choose <strong>Manage palette → Install</strong>.</p></li>
 <li><strong>Search for the package.</strong><p>Search for <code>@avantics/node-red-home-automation</code> and install it.</p></li>
-<li><strong>Find the nodes.</strong><p>They appear in the <strong>home automation</strong> category of the palette.</p></li>
+<li><strong>Find the nodes.</strong><p>They appear in the palette in five categories, by kind: <strong>home devices</strong>, <strong>home lighting</strong>, <strong>home covers</strong>, <strong>home theatre</strong> and <strong>home house</strong>.</p></li>
 </ol>
 </section>
 <section id="npm"><h2>Add it with npm</h2>
@@ -39,7 +39,7 @@
 <div class="code-block"><div class="code-label"><span>Terminal · Node-RED user directory</span></div><pre><code>npm install /path/to/avantics-node-red-home-automation-&lt;version&gt;.tgz</code></pre></div>
 </section>
 <section id="examples"><h2>Import an example flow</h2>
-<p>Add the nodes from the <strong>home automation</strong> palette category, then configure the area, device hosts, MQTT topics, source mappings and timing limits for your home. To start from a wired flow instead, choose <strong>Import → Examples</strong> in the editor and pick one of these from the package:</p>
+<p>Add the nodes from the palette’s <strong>home</strong> categories, then configure the area, device hosts, MQTT topics, source mappings and timing limits for your home. To start from a wired flow instead, choose <strong>Import → Examples</strong> in the editor and pick one of these from the package:</p>
 <div class="table-wrap" role="region" aria-label="Example flows in the package; scroll horizontally on a phone" tabindex="0"><table><caption>Example flows in the package</caption><thead><tr><th scope="col">Example</th><th scope="col">What it shows</th><th scope="col">Needs</th></tr></thead><tbody>
 <tr><td>Room lighting</td><td>Motion and illuminance feed occupancy fusion and the motion policy, a wall switch feeds the switch policy, and a circadian lighting policy styles the room; all send intents to the room lighting controller.</td><td>A Zigbee2MQTT light on your broker. Injects stand in for the sensors and wall switch.</td></tr>
 <tr><td>House schedule</td><td>A house schedule shared by two rooms through their circadian lighting policies, with the optional house schedule MQTT node changing its times.</td><td>Two Zigbee2MQTT lights on your broker, one per room.</td></tr>

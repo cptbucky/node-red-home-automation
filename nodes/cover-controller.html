@@ -26,7 +26,8 @@
       return publishChoice(node) !== "off" || (saved && (on(node.publishState) || on(node.discovery)));
     }
     RED.nodes.registerType("home-cover-controller", {
-      category: "home automation",
+      category: "home covers",
+      paletteLabel: "cover",
       color: "#e2d96e",
       defaults: {
         // A marker only a node new from the palette has, as core nodes do: import

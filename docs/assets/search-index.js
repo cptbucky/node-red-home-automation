@@ -66,7 +66,7 @@ window.DOCS_SEARCH = [
   "section": "Add it from the palette manager",
   "description": "Open the palette manager. In the Node-RED editor, choose Manage palette → Install . Search for the package. Se",
   "url": "install.html#palette",
-  "text": "Open the palette manager. In the Node-RED editor, choose Manage palette → Install . Search for the package. Search for @avantics/node-red-home-automation and install it. Find the nodes. They appear in the home automation category of the palette."
+  "text": "Open the palette manager. In the Node-RED editor, choose Manage palette → Install . Search for the package. Search for @avantics/node-red-home-automation and install it. Find the nodes. They appear in the palette in five categories, by kind: home devices , home lighting , home covers , home theatre and home house ."
  },
  {
   "title": "Install",
@@ -85,9 +85,9 @@ window.DOCS_SEARCH = [
  {
   "title": "Install",
   "section": "Import an example flow",
-  "description": "Add the nodes from the home automation palette category, then configure the area, device hosts, MQTT topics, s",
+  "description": "Add the nodes from the palette’s home categories, then configure the area, device hosts, MQTT topics, source m",
   "url": "install.html#examples",
-  "text": "Add the nodes from the home automation palette category, then configure the area, device hosts, MQTT topics, source mappings and timing limits for your home. To start from a wired flow instead, choose Import → Examples in the editor and pick one of these from the package: Example flows in the package Example What it shows Needs Room lighting Motion and illuminance feed occupancy fusion and the motion policy, a wall switch feeds the switch policy, and a circadian lighting policy styles the room; all send intents to the room lighting controller. A Zigbee2MQTT light on your broker. Injects stand in for the sensors and wall switch. House schedule A house schedule shared by two rooms through their circadian lighting policies, with the optional house schedule MQTT node changing its times. Two Zigbee2MQTT lights on your broker, one per room. Shelly switch A wall switch on a Shelly Gen2 relay in detached mode driving a room’s lights through the switch policy, with no function nodes. A Shelly Gen2 or later relay behind a wall switch, on your broker. Cover control A position cover owned by the cover controller, connected to a Zigbee2MQTT cover through the zigbee2mqtt cover adapter. Its one function node pauses motion lighting while the cover moves. A Zigbee2MQTT cover on your broker. Cover pair Two covers moved as one by a cover group, which reports ready only when both confirm. No devices: injects stand in for the curtains’ reports, and Debug nodes show the commands. Shelly cover A Shelly Gen2 device in cover mode, owned by the cover controller, with no function nodes. A Shelly Gen2 or later device in cover mode, on your broker. Scene One scene holding a room’s lights and pausing motion lighting until it ends by request, by its timer, or by a device’s power staying low (its End below). No devices: Debug nodes stand in for your room lighting controller and motion lighting policy. Home theatre equipment The AVR, display, source capability and backlighting controllers, each taking an intent and reporting target state. For the display controller, your TV, screen and projector power meter on the network (its device hosts). The other controllers’ commands go to Debug nodes. Home theatre activity The theatre state contract and activity controller planning each target and collecting every controller’s state, with activity lighting. The display controller’s devices, as in Home theatre equipment, and a Zigbee2MQTT light, both on your broker or network. Requests come from your broker. The examples show the real setup, with synthetic names: most need the devices the Needs column names, and where one runs without them, it says what stands in. Every node in them that talks MQTT uses one broker config node, “your MQTT broker”: set its host to your broker’s before you deploy. They have no MQTT in, MQTT out or Status nodes. The files are also in examples/ on GitHub."
+  "text": "Add the nodes from the palette’s home categories, then configure the area, device hosts, MQTT topics, source mappings and timing limits for your home. To start from a wired flow instead, choose Import → Examples in the editor and pick one of these from the package: Example flows in the package Example What it shows Needs Room lighting Motion and illuminance feed occupancy fusion and the motion policy, a wall switch feeds the switch policy, and a circadian lighting policy styles the room; all send intents to the room lighting controller. A Zigbee2MQTT light on your broker. Injects stand in for the sensors and wall switch. House schedule A house schedule shared by two rooms through their circadian lighting policies, with the optional house schedule MQTT node changing its times. Two Zigbee2MQTT lights on your broker, one per room. Shelly switch A wall switch on a Shelly Gen2 relay in detached mode driving a room’s lights through the switch policy, with no function nodes. A Shelly Gen2 or later relay behind a wall switch, on your broker. Cover control A position cover owned by the cover controller, connected to a Zigbee2MQTT cover through the zigbee2mqtt cover adapter. Its one function node pauses motion lighting while the cover moves. A Zigbee2MQTT cover on your broker. Cover pair Two covers moved as one by a cover group, which reports ready only when both confirm. No devices: injects stand in for the curtains’ reports, and Debug nodes show the commands. Shelly cover A Shelly Gen2 device in cover mode, owned by the cover controller, with no function nodes. A Shelly Gen2 or later device in cover mode, on your broker. Scene One scene holding a room’s lights and pausing motion lighting until it ends by request, by its timer, or by a device’s power staying low (its End below). No devices: Debug nodes stand in for your room lighting controller and motion lighting policy. Home theatre equipment The AVR, display, source capability and backlighting controllers, each taking an intent and reporting target state. For the display controller, your TV, screen and projector power meter on the network (its device hosts). The other controllers’ commands go to Debug nodes. Home theatre activity The theatre state contract and activity controller planning each target and collecting every controller’s state, with activity lighting. The display controller’s devices, as in Home theatre equipment, and a Zigbee2MQTT light, both on your broker or network. Requests come from your broker. The examples show the real setup, with synthetic names: most need the devices the Needs column names, and where one runs without them, it says what stands in. Every node in them that talks MQTT uses one broker config node, “your MQTT broker”: set its host to your broker’s before you deploy. They have no MQTT in, MQTT out or Status nodes. The files are also in examples/ on GitHub."
  },
  {
   "title": "Install",
@@ -711,6 +711,494 @@ window.DOCS_SEARCH = [
   "text": "Wire controller output 2 to a Debug node, then watch the adapter’s node status as well. Read the outcome What you see What it means Adapter status “waiting for the device” No device message has arrived yet. Check its Broker, and the prefix or friendly name. shelly cover status The cover’s last state and position. zigbee2mqtt cover status as a position (such as 60% ), an end state, or a motion with a position Reports are arriving and being read. zigbee2mqtt cover status “online” / “offline” The last message was an availability report. Controller result not-calibrated / position-unknown A shelly cover cannot provide a usable position. Calibrate it on the device. Controller result unavailable The device is offline. No command is sent; it is read again when it returns. Controller error “observed cover reading has no position” A zigbee2mqtt cover reports no position: set the controller’s Cover to Open, close and stop only . No command reaches the device Check the adapter’s Broker (without one, that the MQTT out node has no topic set and uses the same broker). For a shelly cover, check Enable MQTT Control ; for a zigbee2mqtt cover, check the base topic and friendly name. Importable examples are in the package’s examples folder ( Import → Examples in the editor): Shelly cover.json wires a shelly cover, and Cover control.json wires a zigbee2mqtt cover. Each uses one broker config node, “your MQTT broker”, whose host you set. See also the README Covers section and the cover controller reference . Sources: README Covers; shelly cover, zigbee2mqtt cover and cover controller editor help; the Shelly cover and Cover control example flows."
  },
  {
+  "title": "Zigbee2MQTT light",
+  "description": "Message shapes, output ports and settings for the adapter between a room lighting controller and a Zigbee2MQTT light or group.",
+  "url": "node-z2m-light.html",
+  "text": "Message shapes, output ports and settings for the adapter between a room lighting controller and a Zigbee2MQTT light or group."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Neutral commands in, Zigbee2MQTT out",
+  "description": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt l",
+  "url": "node-z2m-light.html#summary",
+  "text": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt light”) translates a room lighting controller’s neutral light commands into Zigbee2MQTT’s /set payloads, and the light’s reports into neutral readings. Use one per light in the room’s targets. It also tells the room’s own commands from someone else’s, and skips a restyle the light already shows; both depend on Zigbee2MQTT’s units, so they are done here rather than in the room. Looking for wiring? Follow Wire the room . For a light that isn’t Zigbee2MQTT’s, see the neutral light contract . The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect Room controller, output 2 msg.light = {kind: \"command\", target, state, brig",
+  "url": "node-z2m-light.html#inputs",
+  "text": "Input messages From Message Effect Room controller, output 2 msg.light = {kind: \"command\", target, state, brightnessPct?, colorTempKelvin?, transitionSeconds?, extra?, restyle?, source, id} For its own Target only: published on zigbee2mqtt/<device>/set . Others are ignored, so one wire can feed every light’s node. Room controller, output 2 msg.light = {kind: \"observe\", target} For a light: {\"state\": \"\"} on zigbee2mqtt/<device>/get , asking it to report. For a group: nothing, as a group can’t be asked; the room waits for Zigbee2MQTT’s next state for it. MQTT in on zigbee2mqtt/<device>/# The light’s state on zigbee2mqtt/<device> A reading on output 2. MQTT in on zigbee2mqtt/<device>/# A command on zigbee2mqtt/<device>/set Its own echo is dropped; someone else’s becomes an external reading. Retained messages are ignored. MQTT in on zigbee2mqtt/<device>/# zigbee2mqtt/<device>/availability An availability reading. Not for a group. Topics are shown with the default base topic; <device> is the friendly name. Messages on other topics are ignored."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · To the light {topic: \"zigbee2mqtt/<device>/set\", payload, retain:",
+  "url": "node-z2m-light.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · To the light {topic: \"zigbee2mqtt/<device>/set\", payload, retain: false} , or /get An MQTT out node with no topic set. 2 · To the room msg.light readings: observed , external , echo-changed , skipped , availability The room lighting controller’s input. An observed reading is {kind: \"observed\", target, on, brightnessPct?, colorTempKelvin?, fields, showsLast, observedAt} : the values are the light’s, converted back to percent and kelvin; fields lists what it has reported since start ( brightness , colorTemp ); showsLast says it shows exactly the last command sent, in Zigbee2MQTT’s own units. observedAt is when the report arrived."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name / name Empty The canvas label. Brok",
+  "url": "node-z2m-light.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name / name Empty The canvas label. Broker / broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <base>/<friendly name> , its /set and its /availability (exactly these: a friendly name can contain / )) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. It reads its light on each connect (not a group, which Zigbee2MQTT can’t be asked), as a Status node’s startup did through the room. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). Target / target None: required The light’s id in the room controller’s Targets JSON. Base topic / baseTopic zigbee2mqtt Zigbee2MQTT’s base topic. It cannot contain + or # . Friendly name / friendlyName None: required The light’s or group’s name in Zigbee2MQTT. It cannot contain + or # . Zigbee2MQTT group / group Off On for a Zigbee2MQTT group of lights rather than one light."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Device payloads",
+  "description": "Each command becomes the payload the room controller sent before 6.0, field for field and in the same order: t",
+  "url": "node-z2m-light.html#device-topics",
+  "text": "Each command becomes the payload the room controller sent before 6.0, field for field and in the same order: the state, any other fields the intent gave (an effect, say), brightness (1-254, from percent; 0 % is 1, the dimmest), color_temp (mireds, from kelvin), then transition unless the intent set one. An OFF is {\"state\":\"OFF\"} alone. A styled ON, as published {\"state\":\"ON\",\"brightness\":64,\"color_temp\":400,\"transition\":1} A restyle ( restyle: true , sent only for a light already on) is not published when the light’s last report already shows exactly those values; the node answers {kind: \"skipped\", target, id, observedAt} with the time of that report. Any other command is always published."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Its own commands and someone else’s",
+  "description": "Its own: a command on /set exactly as it sent one in the last 5 seconds, even seen twice. Its own, changed on ",
+  "url": "node-z2m-light.html#echo",
+  "text": "Its own: a command on /set exactly as it sent one in the last 5 seconds, even seen twice. Its own, changed on the way: an ON or OFF arriving while one of its own with that power hasn’t come back, as when a function cut it to {\"state\":\"ON\"} : an echo-changed reading, never someone else’s. Someone else’s: anything else: {kind: \"external\", target, state, setsValues, observedAt} , where setsValues says it sets brightness, colour or an effect. The room may take it as a person’s change."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Groups",
+  "description": "A group takes the same commands. Zigbee2MQTT works out a group’s state itself, from what it sent and its membe",
+  "url": "node-z2m-light.html#groups",
+  "text": "A group takes the same commands. Zigbee2MQTT works out a group’s state itself, from what it sent and its members’ reports, so the group’s report follows a command at once. A group has no availability and can’t be asked to report, so it ignores observe : the room waits for Zigbee2MQTT’s next state for the group. Passing on an old state instead could settle a command still on its way. Switch on the group’s retain in Zigbee2MQTT : retain: true under the group in Zigbee2MQTT’s configuration.yaml (it is off by default). Zigbee2MQTT doesn’t retain a group’s state by default, so after a restart the room has no reading for the group until it changes, and an activity that holds it waits on it. With retain, the broker gives the node the group’s last state as soon as its MQTT in node subscribes."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Availability",
+  "description": "zigbee2mqtt/<device>/availability becomes {kind: \"availability\", target, online} on output 2. The room shows i",
+  "url": "node-z2m-light.html#availability",
+  "text": "zigbee2mqtt/<device>/availability becomes {kind: \"availability\", target, online} on output 2. The room shows it on the light’s control sensor and in its status, and changes nothing because of it. It needs Zigbee2MQTT’s availability setting on."
+ },
+ {
+  "title": "Zigbee2MQTT light",
+  "section": "Status",
+  "description": "waiting for the device (or group · waiting for its state ), grey ring, until the first report. group · no stat",
+  "url": "node-z2m-light.html#status",
+  "text": "waiting for the device (or group · waiting for its state ), grey ring, until the first report. group · no state yet: set retain: true for it in Zigbee2MQTT (yellow ring): a group that has had no state 30 seconds after it started. A group can’t be asked for its state, so without Zigbee2MQTT retaining it there is none until it changes, and an activity holding it reports it unobserved . on · 25% 2500K (green) or off (grey) after a report. offline (grey ring) after an availability message saying so."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "description": "Message shapes, output ports and settings for the adapter between a cover controller and a Zigbee2MQTT blind, shutter or curtain motor.",
+  "url": "node-z2m-cover.html",
+  "text": "Message shapes, output ports and settings for the adapter between a cover controller and a Zigbee2MQTT blind, shutter or curtain motor."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Neutral commands in, Zigbee2MQTT out",
+  "description": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt c",
+  "url": "node-z2m-cover.html#summary",
+  "text": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt cover”) translates a cover controller’s neutral commands into Zigbee2MQTT’s set and get messages, and the device’s state reports into neutral cover readings. It has no broker connection of its own: device messages arrive from MQTT in nodes, and its publications leave through an MQTT out node. Never Home Assistant. Looking for wiring? Follow Wire a zigbee2mqtt cover , then Wire a cover for the controller side. The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect Cover controller, output 1 msg.cover_command = {operation, position, …} set",
+  "url": "node-z2m-cover.html#inputs",
+  "text": "Input messages From Message Effect Cover controller, output 1 msg.cover_command = {operation, position, …} set_position , open , close , stop and observe are translated. Other operations are ignored. MQTT in on zigbee2mqtt/<device> The device’s state JSON A reading when it carries a position, a motion or an end state; otherwise ignored. MQTT in on zigbee2mqtt/<device>/availability {\"state\": \"online\"} / \"offline\" , or plain online / offline Availability. Topics are shown with the default base topic; <device> is the friendly name. Messages on other topics are ignored."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · To the device msg.topic and JSON text msg.payload An MQTT out nod",
+  "url": "node-z2m-cover.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · To the device msg.topic and JSON text msg.payload An MQTT out node on the same broker, with no topic set. 2 · To the cover controller msg.cover = {kind: \"observed\", position, state, motion, observedAt, battery, charging} or {kind: \"availability\", online} The cover controller’s input. Fields other than kind and observedAt appear only when reported. observedAt is when the report arrived, never a time the device gives. battery and charging (from charging_status , as text) are passed on."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-z2m-cover.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <base>/<friendly name> and its /availability (exactly these: a friendly name can contain / )) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. It reads its cover on each connect, as a Status node’s startup did through the cover controller. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The device’s friendly name in Zigbee2MQTT. It cannot contain + or # ."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Device topics and payloads",
+  "description": "Messages sent Controller command Topic Payload set_position zigbee2mqtt/<device>/set {\"position\": <0-100>} , r",
+  "url": "node-z2m-cover.html#device-topics",
+  "text": "Messages sent Controller command Topic Payload set_position zigbee2mqtt/<device>/set {\"position\": <0-100>} , rounded and clamped open zigbee2mqtt/<device>/set {\"state\": \"OPEN\"} close zigbee2mqtt/<device>/set {\"state\": \"CLOSE\"} stop zigbee2mqtt/<device>/set {\"state\": \"STOP\"} observe zigbee2mqtt/<device>/get {\"position\": \"\"} , or {\"state\": \"\"} once the device has reported a state without a position Some devices can’t be read through …/get ; they still report their position whenever it changes."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "How a report is read",
+  "description": "Position is position from 0 (closed) to 100 (open), as Zigbee2MQTT reports by default. Set invert on the contr",
+  "url": "node-z2m-cover.html#readings",
+  "text": "Position is position from 0 (closed) to 100 (open), as Zigbee2MQTT reports by default. Set invert on the controller, or the device’s invert_cover option, if yours runs the other way. Motion comes from motor_state ( opening , closing , stopped ; pause reads as stopped), else moving ( UP , DOWN , STOP ), else running: false as stopped. A cover that reports none is confirmed by the controller’s settle time. End state : with a position, open only at 100 and closed only at 0. Without a position, the device’s OPEN or CLOSE , but only once its motion says it has stopped. Set the controller’s Cover to Open, close and stop only for such a cover; one that reports no motion either cannot be confirmed, and the controller says so."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Availability",
+  "description": "zigbee2mqtt/<device>/availability becomes msg.cover = {kind: \"availability\", online} on output 2. It needs Zig",
+  "url": "node-z2m-cover.html#availability",
+  "text": "zigbee2mqtt/<device>/availability becomes msg.cover = {kind: \"availability\", online} on output 2. It needs Zigbee2MQTT’s availability setting on; without it the cover is taken as available."
+ },
+ {
+  "title": "Zigbee2MQTT cover",
+  "section": "Status",
+  "description": "waiting for the device (grey ring) until the first reading. online (green) or offline (grey ring) after an ava",
+  "url": "node-z2m-cover.html#status",
+  "text": "waiting for the device (grey ring) until the first reading. online (green) or offline (grey ring) after an availability message. After a report: the position, such as 60% , or the end state, or position unknown ; while moving it is prefixed with the motion, such as closing · 60% ."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "description": "Message shapes, output ports and settings for the adapter between a Zigbee2MQTT motion, presence or light sensor and a room's occupancy fusion and motion lighting policy.",
+  "url": "node-z2m-sensor.html",
+  "text": "Message shapes, output ports and settings for the adapter between a Zigbee2MQTT motion, presence or light sensor and a room's occupancy fusion and motion lighting policy."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "A sensor’s reports, as the room takes them",
+  "description": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt",
+  "url": "node-z2m-sensor.html#summary",
+  "text": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt sensor”) turns a Zigbee2MQTT sensor’s state reports into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Looking for wiring? Follow Motion and occupancy . The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its occupanc",
+  "url": "node-z2m-sensor.html#inputs",
+  "text": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its occupancy, presence and light level, as below. The broker <base>/<friendly name>/availability : {\"state\": \"online\" | \"offline\"} or plain text Shown on the status. An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
+  "url": "node-z2m-sensor.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-z2m-sensor.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one Zigbee2MQTT uses. The node subscribes to exactly <base>/<friendly name> and its /availability (a friendly name can contain / ). Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The device’s friendly name in Zigbee2MQTT. It cannot contain + or # . Occupancy is occupancyIs · motion | presence motion What the device’s occupancy field is: a PIR sensor’s motion, or presence on an mmWave sensor that reports it as occupancy."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "How a report is read",
+  "description": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Li",
+  "url": "node-z2m-sensor.html#readings",
+  "text": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Light level is illuminance_lux where the device sends it (older devices, beside a raw illuminance ), otherwise illuminance , in lux. Only changes are sent: a report whose values haven’t changed, such as a battery or temperature update, sends nothing. A retained occupancy or presence , with retain set for the device in Zigbee2MQTT, is never acted on: after a restart it is an old reading, and a light switched on from it would be wrong. The next report the sensor sends is passed on, whatever it says. A retained light level is passed on. Availability shows on the status ( offline ); nothing is sent for it. After a restart the room learns the sensor’s state on its next change: Zigbee2MQTT doesn’t retain a device’s state by default, and a battery sensor can’t be asked for a reading."
+ },
+ {
+  "title": "Zigbee2MQTT power",
+  "description": "Message shapes, output port and settings for the adapter that reads a Zigbee2MQTT plug or meter's power for a display controller or a scene.",
+  "url": "node-z2m-power.html",
+  "text": "Message shapes, output port and settings for the adapter that reads a Zigbee2MQTT plug or meter's power for a display controller or a scene."
+ },
+ {
+  "title": "Zigbee2MQTT power",
+  "section": "A plug’s watts, for whatever judges them",
+  "description": "The zigbee2mqtt power node (type home-z2m-power ; canvas label: its name, its friendly name, or “zigbee2mqtt p",
+  "url": "node-z2m-power.html#summary",
+  "text": "The zigbee2mqtt power node (type home-z2m-power ; canvas label: its name, its friendly name, or “zigbee2mqtt power”) turns a Zigbee2MQTT plug or meter’s power into one neutral reading, msg.power . A display mode controller takes it as its projector’s power, judged with its own on and off watts, and a scene takes it for its End below . It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
+ },
+ {
+  "title": "Zigbee2MQTT power",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its power , ",
+  "url": "node-z2m-power.html#inputs",
+  "text": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its power , as below. The broker <base>/<friendly name>/availability Shown on the status. A display controller’s third output, or your flow msg.power = {kind: \"read\"} Asks the plug for its power: {\"power\": \"\"} on <base>/<friendly name>/get . It also asks each time the broker connects. A plug that doesn’t answer /get reports on its next change."
+ },
+ {
+  "title": "Zigbee2MQTT power",
+  "section": "Output",
+  "description": "One output port Port Message Connect to 1 · Power readings msg.power = {kind: \"observed\", watts, observedAt} ,",
+  "url": "node-z2m-power.html#outputs",
+  "text": "One output port Port Message Connect to 1 · Power readings msg.power = {kind: \"observed\", watts, observedAt} , and msg.payload the watts A display controller’s input (its projector’s power), or a scene’s input (its End below). Fixed: watts only, from power as a number of 0 or more; anything else is ignored with a trace. Only a change is sent. observedAt is when the report arrived. A retained report (with retain set for the plug in Zigbee2MQTT) is an old one, so it is never passed on; the read on connect brings a fresh one."
+ },
+ {
+  "title": "Zigbee2MQTT power",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-z2m-power.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one Zigbee2MQTT uses. The node subscribes to exactly <base>/<friendly name> and its /availability , and publishes its read requests on /get . Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The plug’s friendly name in Zigbee2MQTT. It cannot contain + or # ."
+ },
+ {
+  "title": "Shelly switch",
+  "description": "Message shapes, output ports, modes and settings for the adapter for one switch channel of a Shelly Gen2-or-later relay, over the device’s own MQTT API.",
+  "url": "node-shelly-switch.html",
+  "text": "Message shapes, output ports, modes and settings for the adapter for one switch channel of a Shelly Gen2-or-later relay, over the device’s own MQTT API."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "One switch channel, used as the device is set up",
+  "description": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one swi",
+  "url": "node-shelly-switch.html#summary",
+  "text": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one switch channel of a Shelly Gen2-or-later relay. It reads the device’s own configuration for the channel and works in one of two ways: detached , where the wall switch’s presses go to a switch lighting policy and the relay keeps smart bulbs powered, or relay , where the relay is the light. With a Target , the relay is a room light in either mode, and the node is its adapter on the neutral light contract : the room switches the relay, and sees its state (see As a room light ). It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly switch , then the wall switches guide for the switch policy. The devices: Shelly’s Gen2+ device documentation (each device’s components and MQTT)."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect MQTT in on <prefix>/# Device topics (see device topics ) Configuration repl",
+  "url": "node-shelly-switch.html#inputs",
+  "text": "Input messages From Message Effect MQTT in on <prefix>/# Device topics (see device topics ) Configuration replies, status, change notifications, button events and availability; with a Target, also commands on the relay’s command topic. Room controller, output 2 (with a Target) msg.light = {kind: \"command\", target, state, …} or {kind: \"observe\", target} For its own Target only: on or off to the relay, or status_update to have it report. Others are ignored, so one wire can feed every light’s node. Relay mode only msg.switchCommand = {power: \"on\" | \"off\"} Switches the relay. Refused in detached mode, before the mode is known, and while the device is offline; any other power is ignored. msg.status from a Status node MQTT out’s “connected” Taken as the startup message ( msg.shellySwitch = {kind: \"startup\"} ), so the node reads the device’s configuration again once the broker can take it. Wire in a Status node whose scope is your MQTT out node. Any other status message is ignored."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Outputs",
+  "description": "Three output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node o",
+  "url": "node-shelly-switch.html#outputs",
+  "text": "Three output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node on the same broker, with no topic set. 2 · Switch messages or relay state Detached: msg.source messages; relay: msg.switchState (see Mode ) Detached: a switch lighting policy , whose intents go to the room controller. Relay: no node of this package reads that state; with a Target, the room reads output 3 instead. 3 · To the room (with a Target) msg.light readings: observed , external , skipped , sent , availability The room lighting controller’s input. Readings are timed ( observedAt ) when they arrive."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-shelly-switch.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <prefix>/# ) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). MQTT topic prefix topicPrefix · string Empty Required. The device’s topic prefix: its device ID unless a custom prefix is set on the device. It cannot contain + or # . Switch ID channel · number 0 0 , or the number of another switch on a device with more than one. Use one node per switch. Mode mode · enum auto auto (“As the device is set up”) reads the device’s configuration; detached or relay override it, and are needed when it can’t be read. Target target · string Empty Optional. The room’s id for the light the relay is, in the room controller’s Targets JSON, marked \"onOffOnly\": true . Set, the node is that light’s adapter in either mode. Empty, the relay isn’t a room light, as before. On the device, MQTT must be on with Enable MQTT Control and RPC status notifications (both the default)."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Mode",
+  "description": "With auto , the device’s in_mode for switch:<id> decides: detached means detached, and every other mode (follo",
+  "url": "node-shelly-switch.html#mode",
+  "text": "With auto , the device’s in_mode for switch:<id> decides: detached means detached, and every other mode (follow, flip, momentary and the rest) means relay. The input’s type (switch or button) decides what detached mode emits. What each mode emits on output 2 Mode Event Message Detached, switch-type input Input on or off msg.source = \"switch\" , msg.payload = {state} ; every reading from the device’s whole status carries baseline: true , while a change notification does not Detached, button-type input single_push , double_push , long_push msg.source = \"switch-action\" , msg.payload = {action} with single , double or long . The switch policy acts on single and double; long is passed on for later use. Other events are ignored. Detached Device offline or online msg.source = \"switch-availability\" , msg.payload \"online\" or \"offline\" Relay Relay output reported msg.switchState = {kind: \"observed\", on, person, observedAt} ; person is true when the device names its own input as the source of the change Relay Device offline or online msg.switchState = {kind: \"availability\", online} In detached mode without a Target, the relay is never switched from here. If it reports off, the status warns that the bulbs have lost power."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "As a room light",
+  "description": "With a Target , the relay is that room light, whether the device is detached (the wall switch’s presses still ",
+  "url": "node-shelly-switch.html#room-light",
+  "text": "With a Target , the relay is that room light, whether the device is detached (the wall switch’s presses still go to the switch policy, and the room switches the relay) or not (the relay follows the switch, and the room can switch it too). The node speaks the room’s neutral light contract, like the zigbee2mqtt light : Commands: the room’s ON or OFF for its Target becomes on or off on <prefix>/command/switch:<id> . A relay has no brightness, colour or fade, so those are left out: mark the target \"onOffOnly\": true , and the room never sends them. An observe becomes status_update there. A restyle of a relay already on is answered skipped . Readings on output 3: observed with the relay’s output ( fields: [] ; showsLast when it matches the last command sent), each time it reports. A person’s change: external when the relay’s output changes with none of this node’s commands pending (a person at a switch the relay follows, the Shelly app), or when someone else’s on , off or toggle appears on the relay’s command topic. Its own commands’ echoes there are recognised as its own. The room may take an external change as a person’s. Availability: {kind: \"availability\", target, online} , shown by the room, never acted on. msg.switchState and msg.switchCommand in relay mode work as before, for flows that use them."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Device topics and payloads",
+  "description": "Topics sent and read Topic Direction Payload <prefix>/rpc Output 1 {\"id\": <n>, \"src\": \"<prefix>/home-automatio",
+  "url": "node-shelly-switch.html#device-topics",
+  "text": "Topics sent and read Topic Direction Payload <prefix>/rpc Output 1 {\"id\": <n>, \"src\": \"<prefix>/home-automation-switch-<id>\", \"method\": \"Shelly.GetConfig\"} <prefix>/command Output 1 status_update : the device publishes its whole status <prefix>/command/switch:<id> Output 1 (relay mode, or with a Target); read with a Target on or off , or status_update for an observe. Read: its own commands’ echoes, and anyone else’s on , off or toggle . <prefix>/home-automation-switch-<id>/rpc Read The configuration reply: switch:<id> ( in_mode , input_id ) and its input:<n> ( type ). Replies to other requests are ignored. <prefix>/status Read The whole status: the baseline for the relay and the input. <prefix>/status/switch:<id> Read The relay’s status. <prefix>/events/rpc Read NotifyStatus for the relay or input, and NotifyEvent button events. <prefix>/online Read true or false . The reply is addressed under the device’s prefix, so the same MQTT in node on <prefix>/# receives it."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Startup and availability",
+  "description": "Once the flows have started, and whenever the device comes back online, the node sends Shelly.GetConfig and st",
+  "url": "node-shelly-switch.html#availability",
+  "text": "Once the flows have started, and whenever the device comes back online, the node sends Shelly.GetConfig and status_update . If no configuration arrives within 10 seconds, a configuration read earlier is kept; if none was read, it is taken as unreadable, and with Mode on auto nothing is passed on until Mode says how. Offline and online are passed on as shown under Mode , and relay commands are refused while offline."
+ },
+ {
+  "title": "Shelly switch",
+  "section": "Status",
+  "description": "reading the device’s configuration (grey ring) while the request is out. configuration unreadable: set Mode (r",
+  "url": "node-shelly-switch.html#status",
+  "text": "reading the device’s configuration (grey ring) while the request is out. configuration unreadable: set Mode (red ring). The mode found, such as detached, switch input (green). With Mode set, it reads detached (set) or relay (set) , followed by what the device says, if read. Relay mode adds the relay state: · on or · off ; with a Target, the light’s: · hall on . Detached, without a Target, with the relay off adds · relay off: bulbs unpowered (yellow ring). offline (grey ring)."
+ },
+ {
+  "title": "Shelly cover",
+  "description": "Message shapes, output ports and settings for the adapter between a cover controller and a Shelly Gen2-or-later device in cover mode, over the device’s own MQTT API.",
+  "url": "node-shelly-cover.html",
+  "text": "Message shapes, output ports and settings for the adapter between a cover controller and a Shelly Gen2-or-later device in cover mode, over the device’s own MQTT API."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Neutral commands in, Shelly MQTT out",
+  "description": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover ",
+  "url": "node-shelly-cover.html#summary",
+  "text": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover controller’s neutral commands into the device’s MQTT control commands, and the device’s status reports into neutral cover readings. It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly cover , then Wire a cover for the controller side. The devices: Shelly’s Gen2+ device documentation (each device’s components and MQTT)."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Inputs",
+  "description": "One input takes both the controller’s commands and the device’s MQTT messages. Anything else is ignored. Input",
+  "url": "node-shelly-cover.html#inputs",
+  "text": "One input takes both the controller’s commands and the device’s MQTT messages. Anything else is ignored. Input messages From Message Effect Cover controller, output 1 msg.cover_command = {operation, position, generation, …} set_position , stop and observe are translated (see device topics ). Other operations, including open and close , are not translated. MQTT in on <prefix>/# <prefix>/status/cover:<id> The cover’s full status: a new reading. MQTT in <prefix>/events/rpc NotifyStatus changes for this cover are laid over the last full status; NotifyFullStatus replaces it. Only a change of position, state or calibration makes a new reading. MQTT in <prefix>/online true or false : availability."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node on ",
+  "url": "node-shelly-cover.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node on the same broker, with no topic set. 2 · To the cover controller msg.cover = {kind: \"observed\", position, motion, observedAt} , {kind: \"availability\", online} or {kind: \"command_result\", generation, ok: false, reason} The cover controller’s input. Position runs 0 (closed) to 100 (open), as the controller’s does; set invert on the controller if yours runs the other way. Motion is opening , closing or stopped (the device’s open , closed and stopped all read as stopped). observedAt is when the message arrived, never the device’s own clock."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-shelly-cover.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <prefix>/# ) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. It reads its cover on each connect, as a Status node’s startup did through the cover controller. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). MQTT topic prefix topicPrefix · string Empty Required. The device’s topic prefix: its device ID unless a custom prefix is set on the device. It cannot contain + or # . Cover ID channel · number 0 0 , or 1 for a device’s second cover. On the device, MQTT must be on with Enable MQTT Control (the default), or it ignores the commands. RPC status notifications (also the default) report each change. Calibrate the cover on the device first."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Device topics and payloads",
+  "description": "Topics sent and read Topic Direction Payload <prefix>/command/cover:<id> Output 1 pos,<0-100> for set_position",
+  "url": "node-shelly-cover.html#device-topics",
+  "text": "Topics sent and read Topic Direction Payload <prefix>/command/cover:<id> Output 1 pos,<0-100> for set_position (rounded and clamped), stop for stop , status_update for observe . <prefix>/status/cover:<id> Read The cover’s full status JSON, including current_pos , state and pos_control . <prefix>/events/rpc Read NotifyStatus / NotifyFullStatus frames holding cover:<id> . <prefix>/online Read true or false . When only changes have arrived and none carries the position, the node sends status_update to get the full status first."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Availability",
+  "description": "<prefix>/online becomes msg.cover = {kind: \"availability\", online} on output 2. When the device comes back onl",
+  "url": "node-shelly-cover.html#availability",
+  "text": "<prefix>/online becomes msg.cover = {kind: \"availability\", online} on output 2. When the device comes back online, the node also sends status_update , since the cover may have moved while it was away."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Uncalibrated or unknown position",
+  "description": "The node never makes up a position. A cover that is not calibrated ( pos_control false, or no current_pos in a",
+  "url": "node-shelly-cover.html#calibration",
+  "text": "The node never makes up a position. A cover that is not calibrated ( pos_control false, or no current_pos in a full status) or whose position is unknown ( current_pos null) fails the command in hand with {kind: \"command_result\", ok: false, reason} , reason not-calibrated or position-unknown . A set_position is not sent to an uncalibrated cover, which would refuse it. Reports while the device says calibrating are ignored."
+ },
+ {
+  "title": "Shelly cover",
+  "section": "Status",
+  "description": "waiting for the device (grey ring) until the first status arrives. <state> · <position>% (green), for example ",
+  "url": "node-shelly-cover.html#status",
+  "text": "waiting for the device (grey ring) until the first status arrives. <state> · <position>% (green), for example stopped · 60% ; ? stands for an unknown position. not calibrated (yellow)."
+ },
+ {
+  "title": "WLED",
+  "description": "Message shapes, output port and settings for the adapter between a backlighting controller and a WLED light strip.",
+  "url": "node-wled.html",
+  "text": "Message shapes, output port and settings for the adapter between a backlighting controller and a WLED light strip."
+ },
+ {
+  "title": "WLED",
+  "section": "Backlight power through WLED’s own MQTT",
+  "description": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting cont",
+  "url": "node-wled.html#summary",
+  "text": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting controller ’s set_power into WLED’s ON or OFF , and WLED’s brightness reports into the controller’s readings. It talks to WLED through Node-RED’s MQTT broker node, with no MQTT in or out nodes, no function nodes, and never Home Assistant. The device: WLED (the WLED project’s documentation)."
+ },
+ {
+  "title": "WLED",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect Backlighting controller, output 1 msg.backlightingCommand = {operation: \"se",
+  "url": "node-wled.html#inputs",
+  "text": "Input messages From Message Effect Backlighting controller, output 1 msg.backlightingCommand = {operation: \"set_power\", generation, power} Publishes ON or OFF on the device topic and answers command_result ok; while WLED is offline, publishes nothing and answers not ok, reason unavailable . Backlighting controller, output 1 msg.backlightingCommand = {operation: \"observe\", generation} Answers with the last power WLED reported, while it is online. With no report since Node-RED started, it answers when WLED next reports. The broker <device topic>/g , <device topic>/status Its readings and availability (see below). An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "WLED",
+  "section": "Output",
+  "description": "One output port Port Message Connect to 1 · To the backlighting controller msg.backlighting = {kind: \"observed",
+  "url": "node-wled.html#outputs",
+  "text": "One output port Port Message Connect to 1 · To the backlighting controller msg.backlighting = {kind: \"observed\", generation, power, observedAt} or {kind: \"command_result\", generation, ok, reason} The backlighting controller’s input. generation is the command in hand’s; nothing is passed on before the controller’s first command. observedAt is when the answer is given."
+ },
+ {
+  "title": "WLED",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-wled.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one WLED connects to. The node subscribes to exactly <device topic>/g and <device topic>/status , and publishes on the device topic. Device topic deviceTopic · string Empty Required. WLED’s Device Topic, from its Config → Sync Interfaces → MQTT (WLED’s own default is wled/ and its MAC address). It cannot contain + or # ."
+ },
+ {
+  "title": "WLED",
+  "section": "How WLED is read",
+  "description": "Power comes from the brightness WLED publishes on <device topic>/g after every change: 0 is off, anything else",
+  "url": "node-wled.html#readings",
+  "text": "Power comes from the brightness WLED publishes on <device topic>/g after every change: 0 is off, anything else on. Whose change isn’t said: WLED reports a change from its own app, a button or another system the same as one from this node. The backlighting controller judges a reading against what it wants, so a change it didn’t make is a manual change. Availability is online or offline on <device topic>/status . WLED’s documentation doesn’t describe this topic. On the firmware we tested, the broker holds a retained online for it, and WLED publishes online again, not retained, with each change. Until it reports, a command is sent; only offline refuses one. After a restart there is no reading until WLED next changes. On the firmware we tested, each change publishes /g , /c , /v and /status , none of them retained, and nothing reads its state on demand over MQTT: {\"v\":true} , or an {\"on\":true} that changes nothing, on <device topic>/api publishes nothing. So after a start with nothing saved, the theatre’s recovery gets no backlighting answer until then."
+ },
+ {
+  "title": "Everything Presence One",
+  "description": "Message shapes, output ports and settings for the adapter between an Everything Presence One and a room's occupancy fusion and motion lighting policy.",
+  "url": "node-everything-presence-one.html",
+  "text": "Message shapes, output ports and settings for the adapter between an Everything Presence One and a room's occupancy fusion and motion lighting policy."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Everything Presence One, as the room takes it",
+  "description": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “",
+  "url": "node-everything-presence-one.html#summary",
+  "text": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “everything presence one”) turns an Everything Presence One’s PIR, mmWave radar and light sensor (Everything Smart Technology’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. The device: Everything Presence One (Everything Smart Technology’s documentation). Looking for wiring? Follow Motion and occupancy ."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "How it finds its entities",
+  "description": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<co",
+  "url": "node-everything-presence-one.html#discovery",
+  "text": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<component>/<device>/<entity>/config , with its state topic and device class. The node takes binary sensors of class motion as motion, occupancy or presence as presence, and sensors of class illuminance as the light level, skipping any the device marks as disabled by default ( en: false ; on the Apollo, its LD2412 light reading, which isn’t lux), and subscribes to the state topics they name, so a firmware that renames an entity, or a custom topic prefix, still works. Where discovery and the entity names below differ, discovery wins, and the difference is traced. The model must match: the model in the device’s discovery must be the Everything Presence One. Another model’s discovery is ignored, and the status says so. Without discovery , the node uses the entity names below. To turn it on, set mqtt: discovery: true in the device’s ESPHome configuration (ESPHome’s default; some device configurations turn it off) and flash it again. The status ends with discovered or preset ."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "What it reads without discovery",
+  "description": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary",
+  "url": "node-everything-presence-one.html#entities",
+  "text": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary_sensor/mmwave The mmWave radar: sees someone sitting still, so occupancy fusion holds the room while they stay. Light level sensor/illuminance In lux. Its own occupancy entity isn’t read, discovered or not: it combines the PIR and radar on the device, with its own off delay, and occupancy fusion does that combining here."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Inputs",
+  "description": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and prese",
+  "url": "node-everything-presence-one.html#inputs",
+  "text": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and presence, as below. The broker <device>/sensor/<entity>/state : a number The light level. The broker <device>/status : online or offline Shown on the status; decides whether retained states count. An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
+  "url": "node-everything-presence-one.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} , with baseline: true at a start Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input. These are fixed: output 1 carries only booleans from ON and OFF , output 2 only a number. Anything else, such as nan , is ignored with a trace and never passed on. Only a change is sent."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-everything-presence-one.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. Empty (or, for a node saved before this setting, missing) means homeassistant . It cannot contain + or # ."
+ },
+ {
+  "title": "Everything Presence One",
+  "section": "As Node-RED starts",
+  "description": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While t",
+  "url": "node-everything-presence-one.html#restart",
+  "text": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is online , they are its current state, and the node passes motion and presence on with baseline: true (presence first): Someone there: occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change. Room empty: fusion sends occupied: false , so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out. Device not online: its retained states are ignored. States that arrive before its status are held until it says online ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "description": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy.",
+  "url": "node-apollo-r-pro-1.html",
+  "text": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Apollo R PRO-1, as the room takes it",
+  "description": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) t",
+  "url": "node-apollo-r-pro-1.html#summary",
+  "text": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) turns an Apollo R PRO-1’s two radars and light sensor (Apollo Automation’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. The device: Apollo R PRO-1 (Apollo Automation’s documentation). Looking for wiring? Follow Motion and occupancy ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "How it finds its entities",
+  "description": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<co",
+  "url": "node-apollo-r-pro-1.html#discovery",
+  "text": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<component>/<device>/<entity>/config , with its state topic and device class. The node takes binary sensors of class motion as motion, occupancy or presence as presence, and sensors of class illuminance as the light level, skipping any the device marks as disabled by default ( en: false ; on the Apollo, its LD2412 light reading, which isn’t lux), and subscribes to the state topics they name, so a firmware that renames an entity, or a custom topic prefix, still works. Where discovery and the entity names below differ, discovery wins, and the difference is traced. The model must match: the model in the device’s discovery must be the Apollo R PRO-1. Another model’s discovery is ignored, and the status says so. Without discovery , the node uses the entity names below. To turn it on, set mqtt: discovery: true in the device’s ESPHome configuration (ESPHome’s default; some device configurations turn it off) and flash it again. The status ends with discovered or preset ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "What it reads without discovery",
+  "description": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says ",
+  "url": "node-apollo-r-pro-1.html#entities",
+  "text": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says so, and off when every one that has reported says off. Apollo’s firmware has named the LD2450’s entities both ways: without a prefix ( presence , moving_target ) on earlier releases, and with ld2450_ on current ones. The node reads both, and an entity your firmware never publishes doesn’t count. Entities Role Entities What it is Motion binary_sensor/moving_target or binary_sensor/ld2450_moving_target , and binary_sensor/ld2412_moving_target A moving target, from either radar. Presence binary_sensor/presence or binary_sensor/ld2450_presence , and binary_sensor/ld2412_presence Anyone there, still or moving, from either radar. Light level sensor/ltr390_light The LTR390, in lux."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Inputs",
+  "description": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and prese",
+  "url": "node-apollo-r-pro-1.html#inputs",
+  "text": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and presence, as below. The broker <device>/sensor/<entity>/state : a number The light level. The broker <device>/status : online or offline Shown on the status; decides whether retained states count. An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
+  "url": "node-apollo-r-pro-1.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} , with baseline: true at a start Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input. These are fixed: output 1 carries only booleans from ON and OFF , output 2 only a number. Anything else, such as nan , is ignored with a trace and never passed on. Only a change is sent."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-apollo-r-pro-1.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. Empty (or, for a node saved before this setting, missing) means homeassistant . It cannot contain + or # ."
+ },
+ {
+  "title": "Apollo R PRO-1",
+  "section": "As Node-RED starts",
+  "description": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While t",
+  "url": "node-apollo-r-pro-1.html#restart",
+  "text": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is online , they are its current state, and the node passes motion and presence on with baseline: true (presence first): Someone there: occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change. Room empty: fusion sends occupied: false , so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out. Device not online: its retained states are ignored. States that arrive before its status are held until it says online ."
+ },
+ {
   "title": "Room lighting controller",
   "description": "Message shapes, output and settings for the node that owns one room's lights. It turns intents into light commands, tracks who controls each light, and applies the style it is sent.",
   "url": "node-room-controller.html",
@@ -977,88 +1465,6 @@ window.DOCS_SEARCH = [
   "description": "Node status Status Meaning switch fresh · <age> (green) Observed in this runtime within the freshness time. sw",
   "url": "node-switch-policy.html#status",
   "text": "Node status Status Meaning switch fresh · <age> (green) Observed in this runtime within the freshness time. switch stale · <age> (yellow) The baseline is known but older than the freshness time, unconfirmed since start, or without a timestamp. switch unavailable (red) The last availability message said offline. awaiting switch baseline (yellow) No switch state is known yet. The age shows in seconds, minutes or hours, and is refreshed on a timer as the input ages."
- },
- {
-  "title": "House schedule node",
-  "description": "Settings for the configuration node that holds one wake and bed time for many rooms. It has no wires: circadian lighting policies choose it as their Schedule.",
-  "url": "node-house-schedule.html",
-  "text": "Settings for the configuration node that holds one wake and bed time for many rooms. It has no wires: circadian lighting policies choose it as their Schedule."
- },
- {
-  "title": "House schedule node",
-  "section": "One wake time. One bed time. Many rooms.",
-  "description": "A configuration node, like an MQTT broker: it never appears on the canvas and has no inputs or outputs. Choose",
-  "url": "node-house-schedule.html#summary",
-  "text": "A configuration node, like an MQTT broker: it never appears on the canvas and has no inputs or outputs. Choose it in a circadian lighting policy’s Schedule setting and that policy follows its wake and bed times, hearing of every change as it happens, without wires. In the configuration nodes list it shows its name, or “house schedule”. Those policies then have no wake and bed time entities of their own in Home Assistant. A policy that keeps its own times (for a child’s room, say) chooses none. Deleting the house schedule in the editor returns its policies to their own times. Looking for wiring? Follow Share a house schedule to set one up with several rooms."
- },
- {
-  "title": "House schedule node",
-  "section": "Where it is chosen",
-  "description": "Circadian lighting policy : its Schedule setting. The policy follows this schedule’s times. House schedule MQT",
-  "url": "node-house-schedule.html#used-by",
-  "text": "Circadian lighting policy : its Schedule setting. The policy follows this schedule’s times. House schedule MQTT : its Schedule setting. It publishes this schedule’s times and changes them from messages or Home Assistant."
- },
- {
-  "title": "House schedule node",
-  "section": "Settings",
-  "description": "Defaults below are from the editor definition. Times are HH:MM in the Node-RED host’s local time. Editor setti",
-  "url": "node-house-schedule.html#settings",
-  "text": "Defaults below are from the editor definition. Times are HH:MM in the Node-RED host’s local time. Editor settings and exact defaults Setting / property Default Meaning Name name · string house Labels the schedule and names its topics, home/<name>/schedule/... . Needs a letter or digit. Wake time wakeTime · string 07:00 The wake time, from 00:00 to 23:59 . Bed time bedTime · string 23:00 The bed time, from 00:00 to 23:59 ; must differ from the wake time."
- },
- {
-  "title": "House schedule node",
-  "section": "Changing the times",
-  "description": "Times change at runtime from a message or from Home Assistant, through a house schedule MQTT node. A time chan",
-  "url": "node-house-schedule.html#changing",
-  "text": "Times change at runtime from a message or from Home Assistant, through a house schedule MQTT node. A time changed that way lasts until a deploy gives this schedule a different Wake time or Bed time , which then applies. The times in use are kept in the node’s context, so they survive a restart only with a context store configured (see the README’s Recommended setup )."
- },
- {
-  "title": "House schedule MQTT",
-  "description": "Message shapes, output and settings for the node that publishes a house schedule’s times over MQTT and takes changes back. Optional: rooms follow the schedule without it.",
-  "url": "node-house-schedule-mqtt.html",
-  "text": "Message shapes, output and settings for the node that publishes a house schedule’s times over MQTT and takes changes back. Optional: rooms follow the schedule without it."
- },
- {
-  "title": "House schedule MQTT",
-  "section": "The schedule’s MQTT side.",
-  "description": "Publishes a house schedule ’s wake and bed times as retained MQTT state and, with discovery, as Home Assistant",
-  "url": "node-house-schedule-mqtt.html#summary",
-  "text": "Publishes a house schedule ’s wake and bed times as retained MQTT state and, with discovery, as Home Assistant time entities, and changes the schedule from their set topics or from a message. In the palette it is home-house-schedule-mqtt ; on the canvas it shows its name, or “house schedule MQTT”. Use one per schedule: two would share the same topics and entities, and deleting one clears them for both until the other next starts. Looking for wiring? Follow Share a house schedule for the full flow, and Use Home Assistant as the panel for the entities."
- },
- {
-  "title": "House schedule MQTT",
-  "section": "Inputs",
-  "description": "Wire an MQTT in node subscribed to the set topics into the input. Input messages Message Shape Effect Time fro",
-  "url": "node-house-schedule-mqtt.html#inputs",
-  "text": "Wire an MQTT in node subscribed to the set topics into the input. Input messages Message Shape Effect Time from Home Assistant msg.topic = home/<name>/schedule/wake-time/set or …/bed-time/set , msg.payload a time Sets that time. Retained messages and anything but a time are ignored. New times msg.lighting = {kind: \"schedule\", wakeTime, bedTime} , each HH:MM , either one alone Sets the schedule’s times. Startup msg.source = \"startup\" (or msg.lighting.kind = \"startup\" ) Announce again, as after the broker reconnects. msg.status from a Status node MQTT out’s “connected” Taken as the startup message ( msg.source = \"startup\" ), so the node announces itself again once the broker can take it. Wire in a Status node whose scope is your MQTT out node. Any other status message is ignored. A time changed this way lasts until a deploy gives the house schedule a different Wake time or Bed time . Every policy following the schedule hears of the change without wires."
- },
- {
-  "title": "House schedule MQTT",
-  "section": "Outputs",
-  "description": "One output port Port Message Connect to 1 · MQTT publications Retained times, availability and discovery messa",
-  "url": "node-house-schedule-mqtt.html#outputs",
-  "text": "One output port Port Message Connect to 1 · MQTT publications Retained times, availability and discovery messages. Sent at start, at every change to the schedule, and when it stops. An MQTT out node."
- },
- {
-  "title": "House schedule MQTT",
-  "section": "Settings",
-  "description": "Defaults below are from the editor definition. Editor settings and exact defaults Setting / property Default M",
-  "url": "node-house-schedule-mqtt.html#settings",
-  "text": "Defaults below are from the editor definition. Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label; a new palette node starts unnamed. Schedule schedule · home-house-schedule None Required. The house schedule to publish; its name names the topics. Without one, or with a deleted one, the node shows invalid configuration and does nothing. Publish homeAssistant · enum MQTT state and Home Assistant discovery, for a new node MQTT state ( state ): the schedule’s wake and bed times and its availability, with its set topics, plain MQTT for any system to read; MQTT state and Home Assistant discovery ( discovery ): that, and wake and bed time entities announced to Home Assistant, which read that state. It always publishes its state, so there is no Don’t publish. It replaced Home Assistant discovery ( discovery ): a node saved before reads off as MQTT state and on as MQTT state and Home Assistant discovery; a flow saved without either gets MQTT state. Broker broker · mqtt-broker None Node-RED’s MQTT broker node, through which it publishes and reads its set topics itself: it runs its startup each time the broker connects, reconnects included (its announcement, and whatever else its startup does, as a Status node’s “connected” did), announces everything again each time Home Assistant comes back, and output 1 and an MQTT in on its set topics are then no longer needed. It always publishes, so it needs one; opening and saving the node offers the first broker in your flows. A node saved before 6.2 that publishes keeps publishing through output 1, as before, and needs no broker until you choose one: the editor says so, and keeps that when you save it without a broker ( publishesThroughOutput , with no form row). Without a broker, it publishes on output 1. Discovery prefix discoveryPrefix · string homeassistant Home Assistant discovery topic prefix. Must not be empty or contain + or # . New nodes use node-based Home Assistant identifiers ( idScheme = \"node\" ). That internal marker is set when a node is added from the palette; it is not an editor setting. This node has no older entities, so an unset idScheme also means node-based. Entities are named after the schedule, not this node, so a replacement node keeps them."
- },
- {
-  "title": "House schedule MQTT",
-  "section": "MQTT and Home Assistant",
-  "description": "Publishing is what this node is for, so its state is always published. The base topic is home/<name>/schedule ",
-  "url": "node-house-schedule-mqtt.html#publishing",
-  "text": "Publishing is what this node is for, so its state is always published. The base topic is home/<name>/schedule , from the house schedule’s Name . Published state and incoming requests Topic suffix Direction Payload /wake-time/state Output 1 · retained The wake time as HH:MM:SS . /bed-time/state Output 1 · retained The bed time as HH:MM:SS . /availability Output 1 · retained online or offline . /wake-time/set MQTT in → node A new wake time. Not retained. /bed-time/set MQTT in → node A new bed time. Not retained. With discovery on, Home Assistant gets two time entities, Wake time and Bed time, reading the state topics and commanding the set topics. They change the schedule, never a device."
- },
- {
-  "title": "House schedule MQTT",
-  "section": "Status",
-  "description": "The node status shows the times in use, wake HH:MM · bed HH:MM (green), and updates at every change.",
-  "url": "node-house-schedule-mqtt.html#status",
-  "text": "The node status shows the times in use, wake HH:MM · bed HH:MM (green), and updates at every change."
  },
  {
   "title": "Scene",
@@ -1597,492 +2003,86 @@ window.DOCS_SEARCH = [
   "text": "The node status reads <profile>: <phase> , with none when no profile is in hand. Status appearance by phase Phase Appearance idle Grey dot transitioning Blue dot confirming Blue ring ready Green dot failed Yellow ring: an optional target, so the activity is only degraded Any other, such as manual_override Grey ring"
  },
  {
-  "title": "Shelly cover",
-  "description": "Message shapes, output ports and settings for the adapter between a cover controller and a Shelly Gen2-or-later device in cover mode, over the device’s own MQTT API.",
-  "url": "node-shelly-cover.html",
-  "text": "Message shapes, output ports and settings for the adapter between a cover controller and a Shelly Gen2-or-later device in cover mode, over the device’s own MQTT API."
+  "title": "House schedule node",
+  "description": "Settings for the configuration node that holds one wake and bed time for many rooms. It has no wires: circadian lighting policies choose it as their Schedule.",
+  "url": "node-house-schedule.html",
+  "text": "Settings for the configuration node that holds one wake and bed time for many rooms. It has no wires: circadian lighting policies choose it as their Schedule."
  },
  {
-  "title": "Shelly cover",
-  "section": "Neutral commands in, Shelly MQTT out",
-  "description": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover ",
-  "url": "node-shelly-cover.html#summary",
-  "text": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover controller’s neutral commands into the device’s MQTT control commands, and the device’s status reports into neutral cover readings. It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly cover , then Wire a cover for the controller side. The devices: Shelly’s Gen2+ device documentation (each device’s components and MQTT)."
+  "title": "House schedule node",
+  "section": "One wake time. One bed time. Many rooms.",
+  "description": "A configuration node, like an MQTT broker: it never appears on the canvas and has no inputs or outputs. Choose",
+  "url": "node-house-schedule.html#summary",
+  "text": "A configuration node, like an MQTT broker: it never appears on the canvas and has no inputs or outputs. Choose it in a circadian lighting policy’s Schedule setting and that policy follows its wake and bed times, hearing of every change as it happens, without wires. In the configuration nodes list it shows its name, or “house schedule”. Those policies then have no wake and bed time entities of their own in Home Assistant. A policy that keeps its own times (for a child’s room, say) chooses none. Deleting the house schedule in the editor returns its policies to their own times. Looking for wiring? Follow Share a house schedule to set one up with several rooms."
  },
  {
-  "title": "Shelly cover",
-  "section": "Inputs",
-  "description": "One input takes both the controller’s commands and the device’s MQTT messages. Anything else is ignored. Input",
-  "url": "node-shelly-cover.html#inputs",
-  "text": "One input takes both the controller’s commands and the device’s MQTT messages. Anything else is ignored. Input messages From Message Effect Cover controller, output 1 msg.cover_command = {operation, position, generation, …} set_position , stop and observe are translated (see device topics ). Other operations, including open and close , are not translated. MQTT in on <prefix>/# <prefix>/status/cover:<id> The cover’s full status: a new reading. MQTT in <prefix>/events/rpc NotifyStatus changes for this cover are laid over the last full status; NotifyFullStatus replaces it. Only a change of position, state or calibration makes a new reading. MQTT in <prefix>/online true or false : availability."
+  "title": "House schedule node",
+  "section": "Where it is chosen",
+  "description": "Circadian lighting policy : its Schedule setting. The policy follows this schedule’s times. House schedule MQT",
+  "url": "node-house-schedule.html#used-by",
+  "text": "Circadian lighting policy : its Schedule setting. The policy follows this schedule’s times. House schedule MQTT : its Schedule setting. It publishes this schedule’s times and changes them from messages or Home Assistant."
  },
  {
-  "title": "Shelly cover",
-  "section": "Outputs",
-  "description": "Two output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node on ",
-  "url": "node-shelly-cover.html#outputs",
-  "text": "Two output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node on the same broker, with no topic set. 2 · To the cover controller msg.cover = {kind: \"observed\", position, motion, observedAt} , {kind: \"availability\", online} or {kind: \"command_result\", generation, ok: false, reason} The cover controller’s input. Position runs 0 (closed) to 100 (open), as the controller’s does; set invert on the controller if yours runs the other way. Motion is opening , closing or stopped (the device’s open , closed and stopped all read as stopped). observedAt is when the message arrived, never the device’s own clock."
- },
- {
-  "title": "Shelly cover",
+  "title": "House schedule node",
   "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-shelly-cover.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <prefix>/# ) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. It reads its cover on each connect, as a Status node’s startup did through the cover controller. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). MQTT topic prefix topicPrefix · string Empty Required. The device’s topic prefix: its device ID unless a custom prefix is set on the device. It cannot contain + or # . Cover ID channel · number 0 0 , or 1 for a device’s second cover. On the device, MQTT must be on with Enable MQTT Control (the default), or it ignores the commands. RPC status notifications (also the default) report each change. Calibrate the cover on the device first."
+  "description": "Defaults below are from the editor definition. Times are HH:MM in the Node-RED host’s local time. Editor setti",
+  "url": "node-house-schedule.html#settings",
+  "text": "Defaults below are from the editor definition. Times are HH:MM in the Node-RED host’s local time. Editor settings and exact defaults Setting / property Default Meaning Name name · string house Labels the schedule and names its topics, home/<name>/schedule/... . Needs a letter or digit. Wake time wakeTime · string 07:00 The wake time, from 00:00 to 23:59 . Bed time bedTime · string 23:00 The bed time, from 00:00 to 23:59 ; must differ from the wake time."
  },
  {
-  "title": "Shelly cover",
-  "section": "Device topics and payloads",
-  "description": "Topics sent and read Topic Direction Payload <prefix>/command/cover:<id> Output 1 pos,<0-100> for set_position",
-  "url": "node-shelly-cover.html#device-topics",
-  "text": "Topics sent and read Topic Direction Payload <prefix>/command/cover:<id> Output 1 pos,<0-100> for set_position (rounded and clamped), stop for stop , status_update for observe . <prefix>/status/cover:<id> Read The cover’s full status JSON, including current_pos , state and pos_control . <prefix>/events/rpc Read NotifyStatus / NotifyFullStatus frames holding cover:<id> . <prefix>/online Read true or false . When only changes have arrived and none carries the position, the node sends status_update to get the full status first."
+  "title": "House schedule node",
+  "section": "Changing the times",
+  "description": "Times change at runtime from a message or from Home Assistant, through a house schedule MQTT node. A time chan",
+  "url": "node-house-schedule.html#changing",
+  "text": "Times change at runtime from a message or from Home Assistant, through a house schedule MQTT node. A time changed that way lasts until a deploy gives this schedule a different Wake time or Bed time , which then applies. The times in use are kept in the node’s context, so they survive a restart only with a context store configured (see the README’s Recommended setup )."
  },
  {
-  "title": "Shelly cover",
-  "section": "Availability",
-  "description": "<prefix>/online becomes msg.cover = {kind: \"availability\", online} on output 2. When the device comes back onl",
-  "url": "node-shelly-cover.html#availability",
-  "text": "<prefix>/online becomes msg.cover = {kind: \"availability\", online} on output 2. When the device comes back online, the node also sends status_update , since the cover may have moved while it was away."
+  "title": "House schedule MQTT",
+  "description": "Message shapes, output and settings for the node that publishes a house schedule’s times over MQTT and takes changes back. Optional: rooms follow the schedule without it.",
+  "url": "node-house-schedule-mqtt.html",
+  "text": "Message shapes, output and settings for the node that publishes a house schedule’s times over MQTT and takes changes back. Optional: rooms follow the schedule without it."
  },
  {
-  "title": "Shelly cover",
-  "section": "Uncalibrated or unknown position",
-  "description": "The node never makes up a position. A cover that is not calibrated ( pos_control false, or no current_pos in a",
-  "url": "node-shelly-cover.html#calibration",
-  "text": "The node never makes up a position. A cover that is not calibrated ( pos_control false, or no current_pos in a full status) or whose position is unknown ( current_pos null) fails the command in hand with {kind: \"command_result\", ok: false, reason} , reason not-calibrated or position-unknown . A set_position is not sent to an uncalibrated cover, which would refuse it. Reports while the device says calibrating are ignored."
+  "title": "House schedule MQTT",
+  "section": "The schedule’s MQTT side.",
+  "description": "Publishes a house schedule ’s wake and bed times as retained MQTT state and, with discovery, as Home Assistant",
+  "url": "node-house-schedule-mqtt.html#summary",
+  "text": "Publishes a house schedule ’s wake and bed times as retained MQTT state and, with discovery, as Home Assistant time entities, and changes the schedule from their set topics or from a message. In the palette it is home-house-schedule-mqtt ; on the canvas it shows its name, or “house schedule MQTT”. Use one per schedule: two would share the same topics and entities, and deleting one clears them for both until the other next starts. Looking for wiring? Follow Share a house schedule for the full flow, and Use Home Assistant as the panel for the entities."
  },
  {
-  "title": "Shelly cover",
+  "title": "House schedule MQTT",
+  "section": "Inputs",
+  "description": "Wire an MQTT in node subscribed to the set topics into the input. Input messages Message Shape Effect Time fro",
+  "url": "node-house-schedule-mqtt.html#inputs",
+  "text": "Wire an MQTT in node subscribed to the set topics into the input. Input messages Message Shape Effect Time from Home Assistant msg.topic = home/<name>/schedule/wake-time/set or …/bed-time/set , msg.payload a time Sets that time. Retained messages and anything but a time are ignored. New times msg.lighting = {kind: \"schedule\", wakeTime, bedTime} , each HH:MM , either one alone Sets the schedule’s times. Startup msg.source = \"startup\" (or msg.lighting.kind = \"startup\" ) Announce again, as after the broker reconnects. msg.status from a Status node MQTT out’s “connected” Taken as the startup message ( msg.source = \"startup\" ), so the node announces itself again once the broker can take it. Wire in a Status node whose scope is your MQTT out node. Any other status message is ignored. A time changed this way lasts until a deploy gives the house schedule a different Wake time or Bed time . Every policy following the schedule hears of the change without wires."
+ },
+ {
+  "title": "House schedule MQTT",
+  "section": "Outputs",
+  "description": "One output port Port Message Connect to 1 · MQTT publications Retained times, availability and discovery messa",
+  "url": "node-house-schedule-mqtt.html#outputs",
+  "text": "One output port Port Message Connect to 1 · MQTT publications Retained times, availability and discovery messages. Sent at start, at every change to the schedule, and when it stops. An MQTT out node."
+ },
+ {
+  "title": "House schedule MQTT",
+  "section": "Settings",
+  "description": "Defaults below are from the editor definition. Editor settings and exact defaults Setting / property Default M",
+  "url": "node-house-schedule-mqtt.html#settings",
+  "text": "Defaults below are from the editor definition. Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label; a new palette node starts unnamed. Schedule schedule · home-house-schedule None Required. The house schedule to publish; its name names the topics. Without one, or with a deleted one, the node shows invalid configuration and does nothing. Publish homeAssistant · enum MQTT state and Home Assistant discovery, for a new node MQTT state ( state ): the schedule’s wake and bed times and its availability, with its set topics, plain MQTT for any system to read; MQTT state and Home Assistant discovery ( discovery ): that, and wake and bed time entities announced to Home Assistant, which read that state. It always publishes its state, so there is no Don’t publish. It replaced Home Assistant discovery ( discovery ): a node saved before reads off as MQTT state and on as MQTT state and Home Assistant discovery; a flow saved without either gets MQTT state. Broker broker · mqtt-broker None Node-RED’s MQTT broker node, through which it publishes and reads its set topics itself: it runs its startup each time the broker connects, reconnects included (its announcement, and whatever else its startup does, as a Status node’s “connected” did), announces everything again each time Home Assistant comes back, and output 1 and an MQTT in on its set topics are then no longer needed. It always publishes, so it needs one; opening and saving the node offers the first broker in your flows. A node saved before 6.2 that publishes keeps publishing through output 1, as before, and needs no broker until you choose one: the editor says so, and keeps that when you save it without a broker ( publishesThroughOutput , with no form row). Without a broker, it publishes on output 1. Discovery prefix discoveryPrefix · string homeassistant Home Assistant discovery topic prefix. Must not be empty or contain + or # . New nodes use node-based Home Assistant identifiers ( idScheme = \"node\" ). That internal marker is set when a node is added from the palette; it is not an editor setting. This node has no older entities, so an unset idScheme also means node-based. Entities are named after the schedule, not this node, so a replacement node keeps them."
+ },
+ {
+  "title": "House schedule MQTT",
+  "section": "MQTT and Home Assistant",
+  "description": "Publishing is what this node is for, so its state is always published. The base topic is home/<name>/schedule ",
+  "url": "node-house-schedule-mqtt.html#publishing",
+  "text": "Publishing is what this node is for, so its state is always published. The base topic is home/<name>/schedule , from the house schedule’s Name . Published state and incoming requests Topic suffix Direction Payload /wake-time/state Output 1 · retained The wake time as HH:MM:SS . /bed-time/state Output 1 · retained The bed time as HH:MM:SS . /availability Output 1 · retained online or offline . /wake-time/set MQTT in → node A new wake time. Not retained. /bed-time/set MQTT in → node A new bed time. Not retained. With discovery on, Home Assistant gets two time entities, Wake time and Bed time, reading the state topics and commanding the set topics. They change the schedule, never a device."
+ },
+ {
+  "title": "House schedule MQTT",
   "section": "Status",
-  "description": "waiting for the device (grey ring) until the first status arrives. <state> · <position>% (green), for example ",
-  "url": "node-shelly-cover.html#status",
-  "text": "waiting for the device (grey ring) until the first status arrives. <state> · <position>% (green), for example stopped · 60% ; ? stands for an unknown position. not calibrated (yellow)."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "description": "Message shapes, output ports and settings for the adapter between a cover controller and a Zigbee2MQTT blind, shutter or curtain motor.",
-  "url": "node-z2m-cover.html",
-  "text": "Message shapes, output ports and settings for the adapter between a cover controller and a Zigbee2MQTT blind, shutter or curtain motor."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Neutral commands in, Zigbee2MQTT out",
-  "description": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt c",
-  "url": "node-z2m-cover.html#summary",
-  "text": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt cover”) translates a cover controller’s neutral commands into Zigbee2MQTT’s set and get messages, and the device’s state reports into neutral cover readings. It has no broker connection of its own: device messages arrive from MQTT in nodes, and its publications leave through an MQTT out node. Never Home Assistant. Looking for wiring? Follow Wire a zigbee2mqtt cover , then Wire a cover for the controller side. The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Inputs",
-  "description": "Input messages From Message Effect Cover controller, output 1 msg.cover_command = {operation, position, …} set",
-  "url": "node-z2m-cover.html#inputs",
-  "text": "Input messages From Message Effect Cover controller, output 1 msg.cover_command = {operation, position, …} set_position , open , close , stop and observe are translated. Other operations are ignored. MQTT in on zigbee2mqtt/<device> The device’s state JSON A reading when it carries a position, a motion or an end state; otherwise ignored. MQTT in on zigbee2mqtt/<device>/availability {\"state\": \"online\"} / \"offline\" , or plain online / offline Availability. Topics are shown with the default base topic; <device> is the friendly name. Messages on other topics are ignored."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Outputs",
-  "description": "Two output ports Port Message Connect to 1 · To the device msg.topic and JSON text msg.payload An MQTT out nod",
-  "url": "node-z2m-cover.html#outputs",
-  "text": "Two output ports Port Message Connect to 1 · To the device msg.topic and JSON text msg.payload An MQTT out node on the same broker, with no topic set. 2 · To the cover controller msg.cover = {kind: \"observed\", position, state, motion, observedAt, battery, charging} or {kind: \"availability\", online} The cover controller’s input. Fields other than kind and observedAt appear only when reported. observedAt is when the report arrived, never a time the device gives. battery and charging (from charging_status , as text) are passed on."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-z2m-cover.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <base>/<friendly name> and its /availability (exactly these: a friendly name can contain / )) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. It reads its cover on each connect, as a Status node’s startup did through the cover controller. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The device’s friendly name in Zigbee2MQTT. It cannot contain + or # ."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Device topics and payloads",
-  "description": "Messages sent Controller command Topic Payload set_position zigbee2mqtt/<device>/set {\"position\": <0-100>} , r",
-  "url": "node-z2m-cover.html#device-topics",
-  "text": "Messages sent Controller command Topic Payload set_position zigbee2mqtt/<device>/set {\"position\": <0-100>} , rounded and clamped open zigbee2mqtt/<device>/set {\"state\": \"OPEN\"} close zigbee2mqtt/<device>/set {\"state\": \"CLOSE\"} stop zigbee2mqtt/<device>/set {\"state\": \"STOP\"} observe zigbee2mqtt/<device>/get {\"position\": \"\"} , or {\"state\": \"\"} once the device has reported a state without a position Some devices can’t be read through …/get ; they still report their position whenever it changes."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "How a report is read",
-  "description": "Position is position from 0 (closed) to 100 (open), as Zigbee2MQTT reports by default. Set invert on the contr",
-  "url": "node-z2m-cover.html#readings",
-  "text": "Position is position from 0 (closed) to 100 (open), as Zigbee2MQTT reports by default. Set invert on the controller, or the device’s invert_cover option, if yours runs the other way. Motion comes from motor_state ( opening , closing , stopped ; pause reads as stopped), else moving ( UP , DOWN , STOP ), else running: false as stopped. A cover that reports none is confirmed by the controller’s settle time. End state : with a position, open only at 100 and closed only at 0. Without a position, the device’s OPEN or CLOSE , but only once its motion says it has stopped. Set the controller’s Cover to Open, close and stop only for such a cover; one that reports no motion either cannot be confirmed, and the controller says so."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Availability",
-  "description": "zigbee2mqtt/<device>/availability becomes msg.cover = {kind: \"availability\", online} on output 2. It needs Zig",
-  "url": "node-z2m-cover.html#availability",
-  "text": "zigbee2mqtt/<device>/availability becomes msg.cover = {kind: \"availability\", online} on output 2. It needs Zigbee2MQTT’s availability setting on; without it the cover is taken as available."
- },
- {
-  "title": "Zigbee2MQTT cover",
-  "section": "Status",
-  "description": "waiting for the device (grey ring) until the first reading. online (green) or offline (grey ring) after an ava",
-  "url": "node-z2m-cover.html#status",
-  "text": "waiting for the device (grey ring) until the first reading. online (green) or offline (grey ring) after an availability message. After a report: the position, such as 60% , or the end state, or position unknown ; while moving it is prefixed with the motion, such as closing · 60% ."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "description": "Message shapes, output ports and settings for the adapter between a room lighting controller and a Zigbee2MQTT light or group.",
-  "url": "node-z2m-light.html",
-  "text": "Message shapes, output ports and settings for the adapter between a room lighting controller and a Zigbee2MQTT light or group."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Neutral commands in, Zigbee2MQTT out",
-  "description": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt l",
-  "url": "node-z2m-light.html#summary",
-  "text": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt light”) translates a room lighting controller’s neutral light commands into Zigbee2MQTT’s /set payloads, and the light’s reports into neutral readings. Use one per light in the room’s targets. It also tells the room’s own commands from someone else’s, and skips a restyle the light already shows; both depend on Zigbee2MQTT’s units, so they are done here rather than in the room. Looking for wiring? Follow Wire the room . For a light that isn’t Zigbee2MQTT’s, see the neutral light contract . The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Inputs",
-  "description": "Input messages From Message Effect Room controller, output 2 msg.light = {kind: \"command\", target, state, brig",
-  "url": "node-z2m-light.html#inputs",
-  "text": "Input messages From Message Effect Room controller, output 2 msg.light = {kind: \"command\", target, state, brightnessPct?, colorTempKelvin?, transitionSeconds?, extra?, restyle?, source, id} For its own Target only: published on zigbee2mqtt/<device>/set . Others are ignored, so one wire can feed every light’s node. Room controller, output 2 msg.light = {kind: \"observe\", target} For a light: {\"state\": \"\"} on zigbee2mqtt/<device>/get , asking it to report. For a group: nothing, as a group can’t be asked; the room waits for Zigbee2MQTT’s next state for it. MQTT in on zigbee2mqtt/<device>/# The light’s state on zigbee2mqtt/<device> A reading on output 2. MQTT in on zigbee2mqtt/<device>/# A command on zigbee2mqtt/<device>/set Its own echo is dropped; someone else’s becomes an external reading. Retained messages are ignored. MQTT in on zigbee2mqtt/<device>/# zigbee2mqtt/<device>/availability An availability reading. Not for a group. Topics are shown with the default base topic; <device> is the friendly name. Messages on other topics are ignored."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Outputs",
-  "description": "Two output ports Port Message Connect to 1 · To the light {topic: \"zigbee2mqtt/<device>/set\", payload, retain:",
-  "url": "node-z2m-light.html#outputs",
-  "text": "Two output ports Port Message Connect to 1 · To the light {topic: \"zigbee2mqtt/<device>/set\", payload, retain: false} , or /get An MQTT out node with no topic set. 2 · To the room msg.light readings: observed , external , echo-changed , skipped , availability The room lighting controller’s input. An observed reading is {kind: \"observed\", target, on, brightnessPct?, colorTempKelvin?, fields, showsLast, observedAt} : the values are the light’s, converted back to percent and kelvin; fields lists what it has reported since start ( brightness , colorTemp ); showsLast says it shows exactly the last command sent, in Zigbee2MQTT’s own units. observedAt is when the report arrived."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name / name Empty The canvas label. Brok",
-  "url": "node-z2m-light.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name / name Empty The canvas label. Broker / broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <base>/<friendly name> , its /set and its /availability (exactly these: a friendly name can contain / )) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. It reads its light on each connect (not a group, which Zigbee2MQTT can’t be asked), as a Status node’s startup did through the room. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). Target / target None: required The light’s id in the room controller’s Targets JSON. Base topic / baseTopic zigbee2mqtt Zigbee2MQTT’s base topic. It cannot contain + or # . Friendly name / friendlyName None: required The light’s or group’s name in Zigbee2MQTT. It cannot contain + or # . Zigbee2MQTT group / group Off On for a Zigbee2MQTT group of lights rather than one light."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Device payloads",
-  "description": "Each command becomes the payload the room controller sent before 6.0, field for field and in the same order: t",
-  "url": "node-z2m-light.html#device-topics",
-  "text": "Each command becomes the payload the room controller sent before 6.0, field for field and in the same order: the state, any other fields the intent gave (an effect, say), brightness (1-254, from percent; 0 % is 1, the dimmest), color_temp (mireds, from kelvin), then transition unless the intent set one. An OFF is {\"state\":\"OFF\"} alone. A styled ON, as published {\"state\":\"ON\",\"brightness\":64,\"color_temp\":400,\"transition\":1} A restyle ( restyle: true , sent only for a light already on) is not published when the light’s last report already shows exactly those values; the node answers {kind: \"skipped\", target, id, observedAt} with the time of that report. Any other command is always published."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Its own commands and someone else’s",
-  "description": "Its own: a command on /set exactly as it sent one in the last 5 seconds, even seen twice. Its own, changed on ",
-  "url": "node-z2m-light.html#echo",
-  "text": "Its own: a command on /set exactly as it sent one in the last 5 seconds, even seen twice. Its own, changed on the way: an ON or OFF arriving while one of its own with that power hasn’t come back, as when a function cut it to {\"state\":\"ON\"} : an echo-changed reading, never someone else’s. Someone else’s: anything else: {kind: \"external\", target, state, setsValues, observedAt} , where setsValues says it sets brightness, colour or an effect. The room may take it as a person’s change."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Groups",
-  "description": "A group takes the same commands. Zigbee2MQTT works out a group’s state itself, from what it sent and its membe",
-  "url": "node-z2m-light.html#groups",
-  "text": "A group takes the same commands. Zigbee2MQTT works out a group’s state itself, from what it sent and its members’ reports, so the group’s report follows a command at once. A group has no availability and can’t be asked to report, so it ignores observe : the room waits for Zigbee2MQTT’s next state for the group. Passing on an old state instead could settle a command still on its way. Switch on the group’s retain in Zigbee2MQTT : retain: true under the group in Zigbee2MQTT’s configuration.yaml (it is off by default). Zigbee2MQTT doesn’t retain a group’s state by default, so after a restart the room has no reading for the group until it changes, and an activity that holds it waits on it. With retain, the broker gives the node the group’s last state as soon as its MQTT in node subscribes."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Availability",
-  "description": "zigbee2mqtt/<device>/availability becomes {kind: \"availability\", target, online} on output 2. The room shows i",
-  "url": "node-z2m-light.html#availability",
-  "text": "zigbee2mqtt/<device>/availability becomes {kind: \"availability\", target, online} on output 2. The room shows it on the light’s control sensor and in its status, and changes nothing because of it. It needs Zigbee2MQTT’s availability setting on."
- },
- {
-  "title": "Zigbee2MQTT light",
-  "section": "Status",
-  "description": "waiting for the device (or group · waiting for its state ), grey ring, until the first report. group · no stat",
-  "url": "node-z2m-light.html#status",
-  "text": "waiting for the device (or group · waiting for its state ), grey ring, until the first report. group · no state yet: set retain: true for it in Zigbee2MQTT (yellow ring): a group that has had no state 30 seconds after it started. A group can’t be asked for its state, so without Zigbee2MQTT retaining it there is none until it changes, and an activity holding it reports it unobserved . on · 25% 2500K (green) or off (grey) after a report. offline (grey ring) after an availability message saying so."
- },
- {
-  "title": "Shelly switch",
-  "description": "Message shapes, output ports, modes and settings for the adapter for one switch channel of a Shelly Gen2-or-later relay, over the device’s own MQTT API.",
-  "url": "node-shelly-switch.html",
-  "text": "Message shapes, output ports, modes and settings for the adapter for one switch channel of a Shelly Gen2-or-later relay, over the device’s own MQTT API."
- },
- {
-  "title": "Shelly switch",
-  "section": "One switch channel, used as the device is set up",
-  "description": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one swi",
-  "url": "node-shelly-switch.html#summary",
-  "text": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one switch channel of a Shelly Gen2-or-later relay. It reads the device’s own configuration for the channel and works in one of two ways: detached , where the wall switch’s presses go to a switch lighting policy and the relay keeps smart bulbs powered, or relay , where the relay is the light. With a Target , the relay is a room light in either mode, and the node is its adapter on the neutral light contract : the room switches the relay, and sees its state (see As a room light ). It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly switch , then the wall switches guide for the switch policy. The devices: Shelly’s Gen2+ device documentation (each device’s components and MQTT)."
- },
- {
-  "title": "Shelly switch",
-  "section": "Inputs",
-  "description": "Input messages From Message Effect MQTT in on <prefix>/# Device topics (see device topics ) Configuration repl",
-  "url": "node-shelly-switch.html#inputs",
-  "text": "Input messages From Message Effect MQTT in on <prefix>/# Device topics (see device topics ) Configuration replies, status, change notifications, button events and availability; with a Target, also commands on the relay’s command topic. Room controller, output 2 (with a Target) msg.light = {kind: \"command\", target, state, …} or {kind: \"observe\", target} For its own Target only: on or off to the relay, or status_update to have it report. Others are ignored, so one wire can feed every light’s node. Relay mode only msg.switchCommand = {power: \"on\" | \"off\"} Switches the relay. Refused in detached mode, before the mode is known, and while the device is offline; any other power is ignored. msg.status from a Status node MQTT out’s “connected” Taken as the startup message ( msg.shellySwitch = {kind: \"startup\"} ), so the node reads the device’s configuration again once the broker can take it. Wire in a Status node whose scope is your MQTT out node. Any other status message is ignored."
- },
- {
-  "title": "Shelly switch",
-  "section": "Outputs",
-  "description": "Three output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node o",
-  "url": "node-shelly-switch.html#outputs",
-  "text": "Three output ports Port Message Connect to 1 · To the device msg.topic and text msg.payload An MQTT out node on the same broker, with no topic set. 2 · Switch messages or relay state Detached: msg.source messages; relay: msg.switchState (see Mode ) Detached: a switch lighting policy , whose intents go to the room controller. Relay: no node of this package reads that state; with a Target, the room reads output 3 instead. 3 · To the room (with a Target) msg.light readings: observed , external , skipped , sent , availability The room lighting controller’s input. Readings are timed ( observedAt ) when they arrive."
- },
- {
-  "title": "Shelly switch",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-shelly-switch.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Node-RED’s MQTT broker node. With one, the node subscribes to its device’s topics ( <prefix>/# ) and publishes on them itself: output 1 sends nothing, and the MQTT in and MQTT out nodes around it are no longer needed (still wired, a device message on its input is ignored, with a trace, so nothing is doubled). Its own commands come back through its subscription, as through an MQTT in node before, so it still tells them from someone else’s. Needed for a new node; opening and saving the node offers the first broker in your flows. A node saved before 6.2 keeps using its MQTT in and out nodes, and needs no broker until you choose one ( publishesThroughOutput , with no form row, true for it and cleared when a broker is chosen). MQTT topic prefix topicPrefix · string Empty Required. The device’s topic prefix: its device ID unless a custom prefix is set on the device. It cannot contain + or # . Switch ID channel · number 0 0 , or the number of another switch on a device with more than one. Use one node per switch. Mode mode · enum auto auto (“As the device is set up”) reads the device’s configuration; detached or relay override it, and are needed when it can’t be read. Target target · string Empty Optional. The room’s id for the light the relay is, in the room controller’s Targets JSON, marked \"onOffOnly\": true . Set, the node is that light’s adapter in either mode. Empty, the relay isn’t a room light, as before. On the device, MQTT must be on with Enable MQTT Control and RPC status notifications (both the default)."
- },
- {
-  "title": "Shelly switch",
-  "section": "Mode",
-  "description": "With auto , the device’s in_mode for switch:<id> decides: detached means detached, and every other mode (follo",
-  "url": "node-shelly-switch.html#mode",
-  "text": "With auto , the device’s in_mode for switch:<id> decides: detached means detached, and every other mode (follow, flip, momentary and the rest) means relay. The input’s type (switch or button) decides what detached mode emits. What each mode emits on output 2 Mode Event Message Detached, switch-type input Input on or off msg.source = \"switch\" , msg.payload = {state} ; every reading from the device’s whole status carries baseline: true , while a change notification does not Detached, button-type input single_push , double_push , long_push msg.source = \"switch-action\" , msg.payload = {action} with single , double or long . The switch policy acts on single and double; long is passed on for later use. Other events are ignored. Detached Device offline or online msg.source = \"switch-availability\" , msg.payload \"online\" or \"offline\" Relay Relay output reported msg.switchState = {kind: \"observed\", on, person, observedAt} ; person is true when the device names its own input as the source of the change Relay Device offline or online msg.switchState = {kind: \"availability\", online} In detached mode without a Target, the relay is never switched from here. If it reports off, the status warns that the bulbs have lost power."
- },
- {
-  "title": "Shelly switch",
-  "section": "As a room light",
-  "description": "With a Target , the relay is that room light, whether the device is detached (the wall switch’s presses still ",
-  "url": "node-shelly-switch.html#room-light",
-  "text": "With a Target , the relay is that room light, whether the device is detached (the wall switch’s presses still go to the switch policy, and the room switches the relay) or not (the relay follows the switch, and the room can switch it too). The node speaks the room’s neutral light contract, like the zigbee2mqtt light : Commands: the room’s ON or OFF for its Target becomes on or off on <prefix>/command/switch:<id> . A relay has no brightness, colour or fade, so those are left out: mark the target \"onOffOnly\": true , and the room never sends them. An observe becomes status_update there. A restyle of a relay already on is answered skipped . Readings on output 3: observed with the relay’s output ( fields: [] ; showsLast when it matches the last command sent), each time it reports. A person’s change: external when the relay’s output changes with none of this node’s commands pending (a person at a switch the relay follows, the Shelly app), or when someone else’s on , off or toggle appears on the relay’s command topic. Its own commands’ echoes there are recognised as its own. The room may take an external change as a person’s. Availability: {kind: \"availability\", target, online} , shown by the room, never acted on. msg.switchState and msg.switchCommand in relay mode work as before, for flows that use them."
- },
- {
-  "title": "Shelly switch",
-  "section": "Device topics and payloads",
-  "description": "Topics sent and read Topic Direction Payload <prefix>/rpc Output 1 {\"id\": <n>, \"src\": \"<prefix>/home-automatio",
-  "url": "node-shelly-switch.html#device-topics",
-  "text": "Topics sent and read Topic Direction Payload <prefix>/rpc Output 1 {\"id\": <n>, \"src\": \"<prefix>/home-automation-switch-<id>\", \"method\": \"Shelly.GetConfig\"} <prefix>/command Output 1 status_update : the device publishes its whole status <prefix>/command/switch:<id> Output 1 (relay mode, or with a Target); read with a Target on or off , or status_update for an observe. Read: its own commands’ echoes, and anyone else’s on , off or toggle . <prefix>/home-automation-switch-<id>/rpc Read The configuration reply: switch:<id> ( in_mode , input_id ) and its input:<n> ( type ). Replies to other requests are ignored. <prefix>/status Read The whole status: the baseline for the relay and the input. <prefix>/status/switch:<id> Read The relay’s status. <prefix>/events/rpc Read NotifyStatus for the relay or input, and NotifyEvent button events. <prefix>/online Read true or false . The reply is addressed under the device’s prefix, so the same MQTT in node on <prefix>/# receives it."
- },
- {
-  "title": "Shelly switch",
-  "section": "Startup and availability",
-  "description": "Once the flows have started, and whenever the device comes back online, the node sends Shelly.GetConfig and st",
-  "url": "node-shelly-switch.html#availability",
-  "text": "Once the flows have started, and whenever the device comes back online, the node sends Shelly.GetConfig and status_update . If no configuration arrives within 10 seconds, a configuration read earlier is kept; if none was read, it is taken as unreadable, and with Mode on auto nothing is passed on until Mode says how. Offline and online are passed on as shown under Mode , and relay commands are refused while offline."
- },
- {
-  "title": "Shelly switch",
-  "section": "Status",
-  "description": "reading the device’s configuration (grey ring) while the request is out. configuration unreadable: set Mode (r",
-  "url": "node-shelly-switch.html#status",
-  "text": "reading the device’s configuration (grey ring) while the request is out. configuration unreadable: set Mode (red ring). The mode found, such as detached, switch input (green). With Mode set, it reads detached (set) or relay (set) , followed by what the device says, if read. Relay mode adds the relay state: · on or · off ; with a Target, the light’s: · hall on . Detached, without a Target, with the relay off adds · relay off: bulbs unpowered (yellow ring). offline (grey ring)."
- },
- {
-  "title": "Zigbee2MQTT sensor",
-  "description": "Message shapes, output ports and settings for the adapter between a Zigbee2MQTT motion, presence or light sensor and a room's occupancy fusion and motion lighting policy.",
-  "url": "node-z2m-sensor.html",
-  "text": "Message shapes, output ports and settings for the adapter between a Zigbee2MQTT motion, presence or light sensor and a room's occupancy fusion and motion lighting policy."
- },
- {
-  "title": "Zigbee2MQTT sensor",
-  "section": "A sensor’s reports, as the room takes them",
-  "description": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt",
-  "url": "node-z2m-sensor.html#summary",
-  "text": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt sensor”) turns a Zigbee2MQTT sensor’s state reports into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Looking for wiring? Follow Motion and occupancy . The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
- },
- {
-  "title": "Zigbee2MQTT sensor",
-  "section": "Inputs",
-  "description": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its occupanc",
-  "url": "node-z2m-sensor.html#inputs",
-  "text": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its occupancy, presence and light level, as below. The broker <base>/<friendly name>/availability : {\"state\": \"online\" | \"offline\"} or plain text Shown on the status. An MQTT in node wired to its input changes nothing."
- },
- {
-  "title": "Zigbee2MQTT sensor",
-  "section": "Outputs",
-  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
-  "url": "node-z2m-sensor.html#outputs",
-  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input."
- },
- {
-  "title": "Zigbee2MQTT sensor",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-z2m-sensor.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one Zigbee2MQTT uses. The node subscribes to exactly <base>/<friendly name> and its /availability (a friendly name can contain / ). Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The device’s friendly name in Zigbee2MQTT. It cannot contain + or # . Occupancy is occupancyIs · motion | presence motion What the device’s occupancy field is: a PIR sensor’s motion, or presence on an mmWave sensor that reports it as occupancy."
- },
- {
-  "title": "Zigbee2MQTT sensor",
-  "section": "How a report is read",
-  "description": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Li",
-  "url": "node-z2m-sensor.html#readings",
-  "text": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Light level is illuminance_lux where the device sends it (older devices, beside a raw illuminance ), otherwise illuminance , in lux. Only changes are sent: a report whose values haven’t changed, such as a battery or temperature update, sends nothing. A retained occupancy or presence , with retain set for the device in Zigbee2MQTT, is never acted on: after a restart it is an old reading, and a light switched on from it would be wrong. The next report the sensor sends is passed on, whatever it says. A retained light level is passed on. Availability shows on the status ( offline ); nothing is sent for it. After a restart the room learns the sensor’s state on its next change: Zigbee2MQTT doesn’t retain a device’s state by default, and a battery sensor can’t be asked for a reading."
- },
- {
-  "title": "Everything Presence One",
-  "description": "Message shapes, output ports and settings for the adapter between an Everything Presence One and a room's occupancy fusion and motion lighting policy.",
-  "url": "node-everything-presence-one.html",
-  "text": "Message shapes, output ports and settings for the adapter between an Everything Presence One and a room's occupancy fusion and motion lighting policy."
- },
- {
-  "title": "Everything Presence One",
-  "section": "Everything Presence One, as the room takes it",
-  "description": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “",
-  "url": "node-everything-presence-one.html#summary",
-  "text": "The everything presence one node (type home-everything-presence-one ; canvas label: its name, its device, or “everything presence one”) turns an Everything Presence One’s PIR, mmWave radar and light sensor (Everything Smart Technology’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. The device: Everything Presence One (Everything Smart Technology’s documentation). Looking for wiring? Follow Motion and occupancy ."
- },
- {
-  "title": "Everything Presence One",
-  "section": "How it finds its entities",
-  "description": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<co",
-  "url": "node-everything-presence-one.html#discovery",
-  "text": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<component>/<device>/<entity>/config , with its state topic and device class. The node takes binary sensors of class motion as motion, occupancy or presence as presence, and sensors of class illuminance as the light level, skipping any the device marks as disabled by default ( en: false ; on the Apollo, its LD2412 light reading, which isn’t lux), and subscribes to the state topics they name, so a firmware that renames an entity, or a custom topic prefix, still works. Where discovery and the entity names below differ, discovery wins, and the difference is traced. The model must match: the model in the device’s discovery must be the Everything Presence One. Another model’s discovery is ignored, and the status says so. Without discovery , the node uses the entity names below. To turn it on, set mqtt: discovery: true in the device’s ESPHome configuration (ESPHome’s default; some device configurations turn it off) and flash it again. The status ends with discovered or preset ."
- },
- {
-  "title": "Everything Presence One",
-  "section": "What it reads without discovery",
-  "description": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary",
-  "url": "node-everything-presence-one.html#entities",
-  "text": "Entities Role Entity What it is Motion binary_sensor/pir The PIR: quick to see someone arrive. Presence binary_sensor/mmwave The mmWave radar: sees someone sitting still, so occupancy fusion holds the room while they stay. Light level sensor/illuminance In lux. Its own occupancy entity isn’t read, discovered or not: it combines the PIR and radar on the device, with its own off delay, and occupancy fusion does that combining here."
- },
- {
-  "title": "Everything Presence One",
-  "section": "Inputs",
-  "description": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and prese",
-  "url": "node-everything-presence-one.html#inputs",
-  "text": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and presence, as below. The broker <device>/sensor/<entity>/state : a number The light level. The broker <device>/status : online or offline Shown on the status; decides whether retained states count. An MQTT in node wired to its input changes nothing."
- },
- {
-  "title": "Everything Presence One",
-  "section": "Outputs",
-  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
-  "url": "node-everything-presence-one.html#outputs",
-  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} , with baseline: true at a start Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input. These are fixed: output 1 carries only booleans from ON and OFF , output 2 only a number. Anything else, such as nan , is ignored with a trace and never passed on. Only a change is sent."
- },
- {
-  "title": "Everything Presence One",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-everything-presence-one.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. Empty (or, for a node saved before this setting, missing) means homeassistant . It cannot contain + or # ."
- },
- {
-  "title": "Everything Presence One",
-  "section": "As Node-RED starts",
-  "description": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While t",
-  "url": "node-everything-presence-one.html#restart",
-  "text": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is online , they are its current state, and the node passes motion and presence on with baseline: true (presence first): Someone there: occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change. Room empty: fusion sends occupied: false , so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out. Device not online: its retained states are ignored. States that arrive before its status are held until it says online ."
- },
- {
-  "title": "Apollo R PRO-1",
-  "description": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy.",
-  "url": "node-apollo-r-pro-1.html",
-  "text": "Message shapes, output ports and settings for the adapter between an Apollo R PRO-1 and a room's occupancy fusion and motion lighting policy."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "Apollo R PRO-1, as the room takes it",
-  "description": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) t",
-  "url": "node-apollo-r-pro-1.html#summary",
-  "text": "The apollo r pro-1 node (type home-apollo-r-pro-1 ; canvas label: its name, its device, or “apollo r pro-1”) turns an Apollo R PRO-1’s two radars and light sensor (Apollo Automation’s ESPHome presence sensor) into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Its entities are fixed for this device’s firmware; another ESPHome device gets its own node. The device: Apollo R PRO-1 (Apollo Automation’s documentation). Looking for wiring? Follow Motion and occupancy ."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "How it finds its entities",
-  "description": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<co",
-  "url": "node-apollo-r-pro-1.html#discovery",
-  "text": "From the device’s own MQTT discovery first. ESPHome describes each entity, retained, on <discovery prefix>/<component>/<device>/<entity>/config , with its state topic and device class. The node takes binary sensors of class motion as motion, occupancy or presence as presence, and sensors of class illuminance as the light level, skipping any the device marks as disabled by default ( en: false ; on the Apollo, its LD2412 light reading, which isn’t lux), and subscribes to the state topics they name, so a firmware that renames an entity, or a custom topic prefix, still works. Where discovery and the entity names below differ, discovery wins, and the difference is traced. The model must match: the model in the device’s discovery must be the Apollo R PRO-1. Another model’s discovery is ignored, and the status says so. Without discovery , the node uses the entity names below. To turn it on, set mqtt: discovery: true in the device’s ESPHome configuration (ESPHome’s default; some device configurations turn it off) and flash it again. The status ends with discovered or preset ."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "What it reads without discovery",
-  "description": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says ",
-  "url": "node-apollo-r-pro-1.html#entities",
-  "text": "It has two radars, an LD2450 and an LD2412, and no PIR. Each role is on when any radar that has reported says so, and off when every one that has reported says off. Apollo’s firmware has named the LD2450’s entities both ways: without a prefix ( presence , moving_target ) on earlier releases, and with ld2450_ on current ones. The node reads both, and an entity your firmware never publishes doesn’t count. Entities Role Entities What it is Motion binary_sensor/moving_target or binary_sensor/ld2450_moving_target , and binary_sensor/ld2412_moving_target A moving target, from either radar. Presence binary_sensor/presence or binary_sensor/ld2450_presence , and binary_sensor/ld2412_presence Anyone there, still or moving, from either radar. Light level sensor/ltr390_light The LTR390, in lux."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "Inputs",
-  "description": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and prese",
-  "url": "node-apollo-r-pro-1.html#inputs",
-  "text": "Input messages From Topic Effect The broker <device>/binary_sensor/<entity>/state : ON or OFF Motion and presence, as below. The broker <device>/sensor/<entity>/state : a number The light level. The broker <device>/status : online or offline Shown on the status; decides whether retained states count. An MQTT in node wired to its input changes nothing."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "Outputs",
-  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
-  "url": "node-apollo-r-pro-1.html#outputs",
-  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} , with baseline: true at a start Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input. These are fixed: output 1 carries only booleans from ON and OFF , output 2 only a number. Anything else, such as nan , is ignored with a trace and never passed on. Only a change is sent."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-apollo-r-pro-1.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. Empty (or, for a node saved before this setting, missing) means homeassistant . It cannot contain + or # ."
- },
- {
-  "title": "Apollo R PRO-1",
-  "section": "As Node-RED starts",
-  "description": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While t",
-  "url": "node-apollo-r-pro-1.html#restart",
-  "text": "ESPHome keeps every state retained, so the broker hands the node the device’s states as it subscribes. While the device’s status is online , they are its current state, and the node passes motion and presence on with baseline: true (presence first): Someone there: occupancy fusion marks the room occupied and sends nothing, so no light is switched on; lights stay as they are, and motion acts from its next change. Room empty: fusion sends occupied: false , so the motion policy starts its vacancy countdown as if the room had just emptied, and the lights go off when it runs out. Device not online: its retained states are ignored. States that arrive before its status are held until it says online ."
- },
- {
-  "title": "Zigbee2MQTT power",
-  "description": "Message shapes, output port and settings for the adapter that reads a Zigbee2MQTT plug or meter's power for a display controller or a scene.",
-  "url": "node-z2m-power.html",
-  "text": "Message shapes, output port and settings for the adapter that reads a Zigbee2MQTT plug or meter's power for a display controller or a scene."
- },
- {
-  "title": "Zigbee2MQTT power",
-  "section": "A plug’s watts, for whatever judges them",
-  "description": "The zigbee2mqtt power node (type home-z2m-power ; canvas label: its name, its friendly name, or “zigbee2mqtt p",
-  "url": "node-z2m-power.html#summary",
-  "text": "The zigbee2mqtt power node (type home-z2m-power ; canvas label: its name, its friendly name, or “zigbee2mqtt power”) turns a Zigbee2MQTT plug or meter’s power into one neutral reading, msg.power . A display mode controller takes it as its projector’s power, judged with its own on and off watts, and a scene takes it for its End below . It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
- },
- {
-  "title": "Zigbee2MQTT power",
-  "section": "Inputs",
-  "description": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its power , ",
-  "url": "node-z2m-power.html#inputs",
-  "text": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its power , as below. The broker <base>/<friendly name>/availability Shown on the status. A display controller’s third output, or your flow msg.power = {kind: \"read\"} Asks the plug for its power: {\"power\": \"\"} on <base>/<friendly name>/get . It also asks each time the broker connects. A plug that doesn’t answer /get reports on its next change."
- },
- {
-  "title": "Zigbee2MQTT power",
-  "section": "Output",
-  "description": "One output port Port Message Connect to 1 · Power readings msg.power = {kind: \"observed\", watts, observedAt} ,",
-  "url": "node-z2m-power.html#outputs",
-  "text": "One output port Port Message Connect to 1 · Power readings msg.power = {kind: \"observed\", watts, observedAt} , and msg.payload the watts A display controller’s input (its projector’s power), or a scene’s input (its End below). Fixed: watts only, from power as a number of 0 or more; anything else is ignored with a trace. Only a change is sent. observedAt is when the report arrived. A retained report (with retain set for the plug in Zigbee2MQTT) is an old one, so it is never passed on; the read on connect brings a fresh one."
- },
- {
-  "title": "Zigbee2MQTT power",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-z2m-power.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one Zigbee2MQTT uses. The node subscribes to exactly <base>/<friendly name> and its /availability , and publishes its read requests on /get . Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The plug’s friendly name in Zigbee2MQTT. It cannot contain + or # ."
- },
- {
-  "title": "WLED",
-  "description": "Message shapes, output port and settings for the adapter between a backlighting controller and a WLED light strip.",
-  "url": "node-wled.html",
-  "text": "Message shapes, output port and settings for the adapter between a backlighting controller and a WLED light strip."
- },
- {
-  "title": "WLED",
-  "section": "Backlight power through WLED’s own MQTT",
-  "description": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting cont",
-  "url": "node-wled.html#summary",
-  "text": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting controller ’s set_power into WLED’s ON or OFF , and WLED’s brightness reports into the controller’s readings. It talks to WLED through Node-RED’s MQTT broker node, with no MQTT in or out nodes, no function nodes, and never Home Assistant. The device: WLED (the WLED project’s documentation)."
- },
- {
-  "title": "WLED",
-  "section": "Inputs",
-  "description": "Input messages From Message Effect Backlighting controller, output 1 msg.backlightingCommand = {operation: \"se",
-  "url": "node-wled.html#inputs",
-  "text": "Input messages From Message Effect Backlighting controller, output 1 msg.backlightingCommand = {operation: \"set_power\", generation, power} Publishes ON or OFF on the device topic and answers command_result ok; while WLED is offline, publishes nothing and answers not ok, reason unavailable . Backlighting controller, output 1 msg.backlightingCommand = {operation: \"observe\", generation} Answers with the last power WLED reported, while it is online. With no report since Node-RED started, it answers when WLED next reports. The broker <device topic>/g , <device topic>/status Its readings and availability (see below). An MQTT in node wired to its input changes nothing."
- },
- {
-  "title": "WLED",
-  "section": "Output",
-  "description": "One output port Port Message Connect to 1 · To the backlighting controller msg.backlighting = {kind: \"observed",
-  "url": "node-wled.html#outputs",
-  "text": "One output port Port Message Connect to 1 · To the backlighting controller msg.backlighting = {kind: \"observed\", generation, power, observedAt} or {kind: \"command_result\", generation, ok, reason} The backlighting controller’s input. generation is the command in hand’s; nothing is passed on before the controller’s first command. observedAt is when the answer is given."
- },
- {
-  "title": "WLED",
-  "section": "Settings",
-  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
-  "url": "node-wled.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one WLED connects to. The node subscribes to exactly <device topic>/g and <device topic>/status , and publishes on the device topic. Device topic deviceTopic · string Empty Required. WLED’s Device Topic, from its Config → Sync Interfaces → MQTT (WLED’s own default is wled/ and its MAC address). It cannot contain + or # ."
- },
- {
-  "title": "WLED",
-  "section": "How WLED is read",
-  "description": "Power comes from the brightness WLED publishes on <device topic>/g after every change: 0 is off, anything else",
-  "url": "node-wled.html#readings",
-  "text": "Power comes from the brightness WLED publishes on <device topic>/g after every change: 0 is off, anything else on. Whose change isn’t said: WLED reports a change from its own app, a button or another system the same as one from this node. The backlighting controller judges a reading against what it wants, so a change it didn’t make is a manual change. Availability is online or offline on <device topic>/status . WLED’s documentation doesn’t describe this topic. On the firmware we tested, the broker holds a retained online for it, and WLED publishes online again, not retained, with each change. Until it reports, a command is sent; only offline refuses one. After a restart there is no reading until WLED next changes. On the firmware we tested, each change publishes /g , /c , /v and /status , none of them retained, and nothing reads its state on demand over MQTT: {\"v\":true} , or an {\"on\":true} that changes nothing, on <device topic>/api publishes nothing. So after a start with nothing saved, the theatre’s recovery gets no backlighting answer until then."
+  "description": "The node status shows the times in use, wake HH:MM · bed HH:MM (green), and updates at every change.",
+  "url": "node-house-schedule-mqtt.html#status",
+  "text": "The node status shows the times in use, wake HH:MM · bed HH:MM (green), and updates at every change."
  },
  {
   "title": "Theatre MQTT contract",

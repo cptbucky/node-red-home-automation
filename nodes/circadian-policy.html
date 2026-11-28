@@ -27,7 +27,8 @@
       return publishChoice(node) !== "off" || (saved && (on(node.publishState) || on(node.discovery)));
     }
     RED.nodes.registerType("home-circadian-lighting-policy", {
-      category: "home automation",
+      category: "home lighting",
+      paletteLabel: "circadian policy",
       color: "#ffd27f",
       defaults: {
         name: {value: ""},

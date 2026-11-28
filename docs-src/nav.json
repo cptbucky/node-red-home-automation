@@ -21,6 +21,20 @@
     ]
   },
   {
+    "label": "Device nodes",
+    "items": [
+      {"label": "Zigbee2MQTT light", "href": "node-z2m-light.html"},
+      {"label": "Zigbee2MQTT cover", "href": "node-z2m-cover.html"},
+      {"label": "Zigbee2MQTT sensor", "href": "node-z2m-sensor.html"},
+      {"label": "Zigbee2MQTT power", "href": "node-z2m-power.html"},
+      {"label": "Shelly switch", "href": "node-shelly-switch.html"},
+      {"label": "Shelly cover", "href": "node-shelly-cover.html"},
+      {"label": "WLED", "href": "node-wled.html"},
+      {"label": "Everything Presence One", "href": "node-everything-presence-one.html"},
+      {"label": "Apollo R PRO-1", "href": "node-apollo-r-pro-1.html"}
+    ]
+  },
+  {
     "label": "Lighting nodes",
     "items": [
       {"label": "Room lighting controller", "href": "node-room-controller.html"},
@@ -28,8 +42,6 @@
       {"label": "Motion lighting policy", "href": "node-motion-policy.html"},
       {"label": "Occupancy fusion", "href": "node-occupancy-fusion.html"},
       {"label": "Switch lighting policy", "href": "node-switch-policy.html"},
-      {"label": "House schedule node", "href": "node-house-schedule.html"},
-      {"label": "House schedule MQTT", "href": "node-house-schedule-mqtt.html"},
       {"label": "Scene", "href": "node-scene.html"}
     ]
   },
@@ -53,17 +65,10 @@
     ]
   },
   {
-    "label": "Adapter nodes",
+    "label": "House nodes",
     "items": [
-      {"label": "Shelly cover", "href": "node-shelly-cover.html"},
-      {"label": "Zigbee2MQTT cover", "href": "node-z2m-cover.html"},
-      {"label": "Zigbee2MQTT light", "href": "node-z2m-light.html"},
-      {"label": "Shelly switch", "href": "node-shelly-switch.html"},
-      {"label": "Zigbee2MQTT sensor", "href": "node-z2m-sensor.html"},
-      {"label": "Everything Presence One", "href": "node-everything-presence-one.html"},
-      {"label": "Apollo R PRO-1", "href": "node-apollo-r-pro-1.html"},
-      {"label": "Zigbee2MQTT power", "href": "node-z2m-power.html"},
-      {"label": "WLED", "href": "node-wled.html"}
+      {"label": "House schedule node", "href": "node-house-schedule.html"},
+      {"label": "House schedule MQTT", "href": "node-house-schedule-mqtt.html"}
     ]
   },
   {
