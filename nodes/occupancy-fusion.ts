@@ -112,7 +112,8 @@ const registerOccupancyFusion: NodeInitializer = (RED) => {
       }
       const input: OccupancyInput = {
         source: String(msg.source ?? ""),
-        payload: msg.payload
+        payload: msg.payload,
+        baseline: msg.baseline === true
       };
       const result = runReducer(node, {area: fusionConfig.area, component: "occupancy-fusion"},
         (saved: Partial<OccupancyState> | undefined) => transitionOccupancy(saved, input, fusionConfig));

@@ -60,6 +60,7 @@
       {"label": "Zigbee2MQTT light", "href": "node-z2m-light.html"},
       {"label": "Shelly switch", "href": "node-shelly-switch.html"},
       {"label": "Zigbee2MQTT sensor", "href": "node-z2m-sensor.html"},
+      {"label": "ESPHome sensor", "href": "node-esphome-sensor.html"},
       {"label": "WLED", "href": "node-wled.html"}
     ]
   },

@@ -27,6 +27,7 @@ import registerShellySwitch from "../nodes/shelly-switch";
 import registerZ2mCover from "../nodes/z2m-cover";
 import registerWled from "../nodes/wled";
 import registerZ2mSensor from "../nodes/z2m-sensor";
+import registerEsphomeSensor from "../nodes/esphome-sensor";
 import registerScene from "../nodes/scene";
 import {fakeBroker} from "./helpers/fake-broker";
 import type {SharedSchedule} from "../lib/house-schedule";
@@ -1486,6 +1487,31 @@ test("a zigbee2mqtt sensor through a broker: occupancy fusion hears its motion, 
   broker.deliver("z2m/hall/motion/availability", "{\"state\":\"offline\"}");
   assert.equal((sensor.statuses.at(-1) as {text: string}).text, "offline");
   const lonely = new (runtime(registerZ2mSensor).Constructor)({id: "sensor-lonely", friendlyName: "x"});
+  t.after(() => close(lonely));
+  assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
+});
+
+test("an esphome sensor through a broker: its model's entities, a retained baseline while online, and nothing published", async (t) => {
+  const broker = fakeBroker();
+  builtNodes.set("broker-esphome", broker);
+  const sensor = new (runtime(registerEsphomeSensor).Constructor)({id: "kitchen-sensor", device: "kitchen-sensor", model: "apollo-r-pro-1", broker: "broker-esphome"});
+  t.after(() => close(sensor));
+  assert.deepEqual(sensor.errors, []);
+  assert.deepEqual([...broker.subscriptions.keys()].sort(), [
+    "kitchen-sensor/binary_sensor/ld2412_moving_target/state", "kitchen-sensor/binary_sensor/ld2412_presence/state",
+    "kitchen-sensor/binary_sensor/moving_target/state", "kitchen-sensor/binary_sensor/presence/state",
+    "kitchen-sensor/sensor/ltr390_light/state", "kitchen-sensor/status"]);
+  broker.connect();
+  // The broker hands over the retained states, then the status.
+  for (const [entity, value] of [["presence", "ON"], ["ld2412_presence", "OFF"], ["moving_target", "OFF"], ["ld2412_moving_target", "OFF"]]) {
+    broker.deliver(`kitchen-sensor/binary_sensor/${entity}/state`, value!, true);
+  }
+  broker.deliver("kitchen-sensor/sensor/ltr390_light/state", "6.3", true);
+  broker.deliver("kitchen-sensor/status", "online", true);
+  const outputs = (sensor.sent as Array<Array<Array<Record<string, unknown>> | null>>).flatMap(([occupancy]) => occupancy ?? []);
+  assert.deepEqual(outputs, [{source: "presence", payload: true, baseline: true}, {source: "motion", payload: false, baseline: true}]);
+  assert.deepEqual(broker.published, []);
+  const lonely = new (runtime(registerEsphomeSensor).Constructor)({id: "esphome-lonely", device: "x", model: "apollo-r-pro-1"});
   t.after(() => close(lonely));
   assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
 });

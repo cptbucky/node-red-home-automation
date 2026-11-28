@@ -69,7 +69,8 @@
       "home-shelly-switch": "dist/nodes/shelly-switch.js",
       "home-z2m-cover": "dist/nodes/z2m-cover.js",
       "home-wled": "dist/nodes/wled.js",
-      "home-z2m-sensor": "dist/nodes/z2m-sensor.js"
+      "home-z2m-sensor": "dist/nodes/z2m-sensor.js",
+      "home-esphome-sensor": "dist/nodes/esphome-sensor.js"
     }
   },
   "devDependencies": {

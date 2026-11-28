@@ -331,6 +331,16 @@ test("the shelly switch adapter has no default device, a mode as the device is s
   assert.equal(definition.defaults.target!.value, "", "not a room light unless set");
 });
 
+test("the esphome sensor needs a broker, its device and a named model, and labels its two outputs", () => {
+  const definition = editorDefinition("esphome-sensor.html");
+  assert.deepEqual([definition.defaults.broker!.type, definition.defaults.broker!.required, definition.defaults.device!.value, definition.defaults.model!.value],
+    ["mqtt-broker", true, "", ""]);
+  const valid = (key: string, value: unknown) => definition.defaults[key]!.validate!.call({}, value);
+  assert.deepEqual([valid("model", "everything-presence-one"), valid("model", "apollo-r-pro-1"), valid("model", "custom"), valid("device", ""), valid("device", "kitchen-sensor")],
+    [true, true, false, false, true]);
+  assert.deepEqual(definition.outputs, 2);
+});
+
 test("the zigbee2mqtt sensor needs a broker and its device, defaults occupancy to motion, and labels its two outputs", () => {
   const definition = editorDefinition("z2m-sensor.html");
   assert.deepEqual([definition.defaults.broker!.type, definition.defaults.broker!.required, definition.defaults.friendlyName!.value,
