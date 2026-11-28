@@ -6,12 +6,12 @@
 }-->
 <div class="meta"><span class="tag">Project</span><a class="tag" href="https://github.com/avantics-hq/node-red-home-automation/releases">GitHub release notes ↗</a></div>
 <section id="supported"><h2>Supported versions</h2>
-<p>The package needs Node-RED 5.0.0 or newer. From 6.0.0, it also needs Node.js 24 or newer.</p>
+<p>The package needs Node-RED 5.0.0 or newer, and Node.js 22.9 or newer, as Node-RED 5 does. Releases 6.0.0 to 6.3.0 asked for Node.js 24.</p>
 <div class="table-wrap" role="region" aria-label="Supported versions; scroll horizontally on a phone" tabindex="0"><table><caption>Supported versions</caption><thead><tr><th scope="col">Package</th><th scope="col">Node-RED</th><th scope="col">Node.js</th></tr></thead><tbody>
-<tr><td>6.x</td><td>5.0.0 or newer</td><td>24 or newer</td></tr>
+<tr><td>6.x</td><td>5.0.0 or newer</td><td>22.9 or newer (6.0.0 to 6.3.0: 24 or newer)</td></tr>
 <tr><td>5.x</td><td>5.0.0 or newer</td><td>22.9 or newer</td></tr>
 </tbody></table></div>
-<p>Node-RED 5 itself runs on Node.js 22.9 or newer; from 6.0.0 this package asks for 24. Check your Node.js version before you update the package.</p>
+<p>Node-RED 5 itself runs on Node.js 22.9 or newer, and so does the package again after 6.3.0. Check your Node.js version before you update the package.</p>
 </section>
 <section id="numbering"><h2>How versions are numbered</h2>
 <ul class="rule-list">
@@ -32,12 +32,12 @@
 <p>Each <a href="https://github.com/avantics-hq/node-red-home-automation/releases">GitHub Release</a> also attaches the package tarball and its SHA-256 checksum, which <strong>Manage palette → Install → Upload module</strong> accepts.</p>
 </section>
 <section id="v6"><h2>Version 6</h2>
-<p>6.0 takes circadian lighting out of the room controller into its own node, the <strong>circadian lighting policy</strong>, which sends rooms the style to use. The room controller applies whatever style it is sent, and a light can be marked on/off only. The room controller also stops speaking Zigbee2MQTT: it sends each light neutral commands through an adapter, the new <strong>zigbee2mqtt light</strong> node, whose messages to the light are byte for byte what the room sent before, and passes each light’s readings to activity lighting. 6.0 also gathers every change that asks something of you: it needs Node.js 24, takes only <code>true</code> or <code>false</code> on enable inputs, removes what 5.0 deprecated, and no longer lets code import the package’s files. Each of these shows itself, as an invalid node or a warning in the log, rather than failing silently.</p>
+<p>6.0 takes circadian lighting out of the room controller into its own node, the <strong>circadian lighting policy</strong>, which sends rooms the style to use. The room controller applies whatever style it is sent, and a light can be marked on/off only. The room controller also stops speaking Zigbee2MQTT: it sends each light neutral commands through an adapter, the new <strong>zigbee2mqtt light</strong> node, whose messages to the light are byte for byte what the room sent before, and passes each light’s readings to activity lighting. 6.0 also gathers every change that asks something of you: it needed Node.js 24 (releases after 6.3.0 run on 22.9 again), takes only <code>true</code> or <code>false</code> on enable inputs, removes what 5.0 deprecated, and no longer lets code import the package’s files. Each of these shows itself, as an invalid node or a warning in the log, rather than failing silently.</p>
 <p>It also brings what was added since 5.0.0: the zigbee2mqtt cover and shelly switch nodes, discovery announced as the flows start, and a Shelly script that keeps a detached wall switch working without Node-RED.</p>
 <h3>When you upgrade from 5.x</h3>
 <ul>
 <li><strong>Migrate every room lighting controller.</strong> A room saved before 6.0 is an invalid configuration, and its lights don’t respond, until you migrate it. In its edit dialog, click <strong>Create Zigbee2MQTT light nodes</strong> to add and wire a zigbee2mqtt light per light (a light whose topics weren’t Zigbee2MQTT’s is flagged, to set up by hand on the neutral light contract). Add a circadian lighting policy, copy the room’s old circadian, sleep and schedule settings into it (the room’s edit dialog lists them), move any Home Assistant switches, set topics and flows that changed circadian lighting or sleep over to it, then click <strong>Done</strong>, which keeps only each light’s id in Targets JSON. A room that should stay unstyled needs only the light nodes and that last step. A flow that filtered the room’s output by the old command topics must now take the light nodes’ output. Follow the <a href="https://github.com/avantics-hq/node-red-home-automation#600">step-by-step migration in the README</a>.</li>
-<li><strong>Update Node.js to 24 or newer</strong> before you update the package.</li>
+<li><strong>Check your Node.js version</strong> before you update the package: 22.9 or newer for releases after 6.3.0, 24 or newer for 6.0.0 to 6.3.0.</li>
 <li><strong>Send <code>true</code> or <code>false</code> to enable inputs:</strong> the motion policy’s <code>area-enabled</code>, <code>global-enabled</code> and <code>pause</code>, and the circadian lighting policy’s circadian and sleep messages. Strings such as <code>"ON"</code> are refused with a warning. Home Assistant’s own <code>ON</code> and <code>OFF</code> on the <code>…/set</code> topics still work.</li>
 <li><strong>Mark a person’s change with <code>manual: true</code>.</strong> An intent’s values alone no longer make a light manual.</li>
 <li><strong>Replace what 5.0 deprecated</strong> (see <a href="#v5">Version 5</a>): Zigbee2MQTT’s brightness and color_temp in intents and activity lighting profiles, the receiver’s 0-98 volume, and the display controller’s old projector meter setting.</li>

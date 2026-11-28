@@ -24,7 +24,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24.0.0  # the minimum we support (engines >=24)
+          node-version: 22.9.0  # the minimum we support (engines >=22.9, as Node-RED 5's own)
           cache: npm
 
       - name: Install dependencies
@@ -72,7 +72,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: 22.9.0
 
       - name: Scan public content
         run: npm run scan:public
@@ -126,6 +126,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
+          # Not 22.9: staging below needs npm stage, from npm 11, and Node.js
+          # 22.9.0 brings npm 10.8.
           node-version: 24
           registry-url: https://registry.npmjs.org
 
