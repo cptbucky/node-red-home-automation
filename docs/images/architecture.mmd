@@ -30,13 +30,17 @@ flowchart TB
     ZC[z2m-cover]
     SC[shelly-cover]
     WL[wled]
+    ZS[z2m-sensor]
   end
   BROKER[(MQTT broker)]
   HA[Home Assistant: the panel<br/>shows state, sends set messages]
-  DEV[(Devices: Zigbee2MQTT lights and covers,<br/>Shelly switches and covers,<br/>a WLED TV backlight)]
+  DEV[(Devices: Zigbee2MQTT lights, covers and sensors,<br/>Shelly switches and covers,<br/>a WLED TV backlight)]
   AV[(AV device transports)]
 
-  SENS --> OCC --> MOT
+  SENS --> ZS
+  ZS -- motion and presence --> OCC
+  OCC --> MOT
+  ZS -- light level --> MOT
   LUX --> MOT
   HS -. times, without wires .-> CIRC
   CIRC -- style --> ROOM

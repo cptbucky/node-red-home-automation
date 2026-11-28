@@ -1,0 +1,68 @@
+<script type="text/javascript">
+  RED.nodes.registerType("home-z2m-sensor", {
+    category: "home automation",
+    color: "#e2d96e",
+    defaults: {
+      name: {value: ""},
+      // Node-RED's MQTT broker node, through which it subscribes to its
+      // device's topics. The editor offers the first broker when the dialog is
+      // opened and saved.
+      broker: {value: "", type: "mqtt-broker", required: true},
+      baseTopic: {value: "zigbee2mqtt", required: true, validate: function (v) {
+        var base = String(v || "").trim().replace(/^\/+|\/+$/g, "");
+        return base !== "" && !/[+#]/.test(base);
+      }},
+      // No default: it names the user's own device.
+      friendlyName: {value: "", required: true, validate: function (v) {
+        var name = String(v || "").trim().replace(/^\/+|\/+$/g, "");
+        return name !== "" && !/[+#]/.test(name);
+      }},
+      // What the device's "occupancy" is: a PIR's motion, or on some mmWave
+      // sensors, presence.
+      occupancyIs: {value: "motion", required: true, validate: function (v) { return v === "motion" || v === "presence"; }}
+    },
+    inputs: 1,
+    outputs: 2,
+    outputLabels: ["motion and presence, to occupancy fusion", "light level, to the motion lighting policy"],
+    icon: "font-awesome/fa-eye",
+    label: function () { return this.name || this.friendlyName || "zigbee2mqtt sensor"; },
+    paletteLabel: "zigbee2mqtt sensor"
+  });
+</script>
+
+<script type="text/html" data-template-name="home-z2m-sensor">
+  <div class="form-row"><label for="node-input-name">Name</label><input type="text" id="node-input-name"></div>
+  <div class="form-row"><label for="node-input-broker">Broker</label><input type="text" id="node-input-broker"></div>
+  <div class="form-row"><label for="node-input-baseTopic">Base topic</label><input type="text" id="node-input-baseTopic"></div>
+  <div class="form-row"><label for="node-input-friendlyName">Friendly name</label><input type="text" id="node-input-friendlyName" placeholder="the device's name in Zigbee2MQTT"></div>
+  <div class="form-row"><label for="node-input-occupancyIs">Occupancy is</label><select id="node-input-occupancyIs">
+    <option value="motion">motion (a PIR sensor)</option>
+    <option value="presence">presence (an mmWave sensor that reports it as occupancy)</option>
+  </select></div>
+  <div class="form-tips">It subscribes to the device's topic and its availability itself: no MQTT in or change nodes.</div>
+</script>
+
+<script type="text/html" data-help-name="home-z2m-sensor">
+  <p>Connects a Zigbee2MQTT motion, presence or light sensor to a room: its reports become the messages <b>home occupancy
+    fusion</b> and the <b>home motion lighting policy</b> take, over Zigbee2MQTT's MQTT messages: no function or change
+    nodes, and never Home Assistant.</p>
+  <h3>Wiring</h3>
+  <ol>
+    <li>Output 1 (motion and presence) → occupancy fusion.</li>
+    <li>Output 2 (light level) → the motion lighting policy.</li>
+  </ol>
+  <p>Choose the <b>Broker</b> Zigbee2MQTT uses, and set the <b>Friendly name</b> (and the <b>Base topic</b> if you changed
+    Zigbee2MQTT's). It subscribes to <code>&lt;base&gt;/&lt;friendly name&gt;</code> and its <code>/availability</code>.</p>
+  <h3>Readings</h3>
+  <ul>
+    <li><code>occupancy</code> → <code>{source: "motion", payload: true | false}</code> on output 1, or <code>"presence"</code>
+      with <b>Occupancy is</b> set to presence; <code>presence</code> → <code>{source: "presence", payload}</code>.</li>
+    <li><code>illuminance_lux</code>, or else <code>illuminance</code>, → <code>{source: "illuminance", payload: &lt;lux&gt;}</code>
+      on output 2.</li>
+    <li>Only a value that changed is sent, so a battery or temperature report sends nothing.</li>
+    <li>A retained occupancy or presence (with retain set for the device in Zigbee2MQTT) is never acted on: after a
+      restart it is an old reading. The next report the sensor sends is passed on.</li>
+    <li>Availability shows on the status (<i>offline</i>); nothing is sent for it. Battery sensors can't be asked for a
+      reading, so after a restart the room learns the sensor's state on its next change.</li>
+  </ul>
+</script>

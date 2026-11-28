@@ -26,6 +26,7 @@ import registerShellyCover from "../nodes/shelly-cover";
 import registerShellySwitch from "../nodes/shelly-switch";
 import registerZ2mCover from "../nodes/z2m-cover";
 import registerWled from "../nodes/wled";
+import registerZ2mSensor from "../nodes/z2m-sensor";
 import registerScene from "../nodes/scene";
 import {fakeBroker} from "./helpers/fake-broker";
 import type {SharedSchedule} from "../lib/house-schedule";
@@ -1459,6 +1460,32 @@ test("a WLED node and a backlighting controller, through a broker: on, read back
   assert.equal((backlight.context().get("state") as {phase: string}).phase, "manual_override");
   // No broker: an invalid configuration.
   const lonely = new (runtime(registerWled).Constructor)({id: "wled-lonely", deviceTopic: "home/test/light/other"});
+  t.after(() => close(lonely));
+  assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
+});
+
+test("a zigbee2mqtt sensor through a broker: occupancy fusion hears its motion, the motion policy its light level", async (t) => {
+  const broker = fakeBroker();
+  builtNodes.set("broker-sensor", broker);
+  const sensor = new (runtime(registerZ2mSensor).Constructor)({id: "hall-sensor", baseTopic: "z2m", friendlyName: "hall/motion", broker: "broker-sensor"});
+  const fusion = new (runtime(registerOccupancy).Constructor)({id: "hall-fusion", area: "", presenceMode: "none"});
+  for (const node of [sensor, fusion]) t.after(() => close(node));
+  assert.deepEqual([sensor.errors, fusion.errors], [[], []]);
+  assert.deepEqual([...broker.subscriptions.keys()].sort(), ["z2m/hall/motion", "z2m/hall/motion/availability"]);
+  broker.connect();
+  assert.deepEqual(broker.published, [], "nothing to read on connect");
+  // A retained report after a restart: no motion passed on.
+  broker.deliver("z2m/hall/motion", "{\"occupancy\":true,\"illuminance\":8}", true);
+  const first = sensor.sent.splice(0) as Array<Array<Array<Record<string, unknown>> | null>>;
+  assert.deepEqual(first.map(([occupancy, light]) => [occupancy, light]), [[null, [{source: "illuminance", payload: 8}]]]);
+  // Someone walks in: fusion goes occupied.
+  broker.deliver("z2m/hall/motion", "{\"occupancy\":true,\"illuminance\":8}");
+  const sent = sensor.sent.splice(0) as Array<Array<Array<Record<string, unknown>> | null>>;
+  for (const msg of sent[0]?.[0] ?? []) await receive(fusion, msg);
+  assert.equal((fusion.context().get("state") as {occupied: boolean}).occupied, true);
+  broker.deliver("z2m/hall/motion/availability", "{\"state\":\"offline\"}");
+  assert.equal((sensor.statuses.at(-1) as {text: string}).text, "offline");
+  const lonely = new (runtime(registerZ2mSensor).Constructor)({id: "sensor-lonely", friendlyName: "x"});
   t.after(() => close(lonely));
   assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
 });

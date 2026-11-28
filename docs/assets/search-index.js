@@ -190,7 +190,7 @@ window.DOCS_SEARCH = [
   "section": "Wire sensors to the room controller",
   "description": "Occupancy flows one way: sensors into occupancy fusion, its events into the motion policy, and the policy’s in",
   "url": "guide-motion-occupancy.html#wiring",
-  "text": "Occupancy flows one way: sensors into occupancy fusion, its events into the motion policy, and the policy’s intents into the room lighting controller, which owns the light commands. Occupancy fusion Motion + presence → occupied → Motion lighting policy Occupancy + lux → ON / OFF intents → Room lighting controller Owns the light commands MQTT in (motion, presence) → occupancy fusion · MQTT in (illuminance) → motion policy Broker Optional publishing, through each node’s Broker setting Sensors feed occupancy fusion; occupancy and light level feed the motion policy; its intents feed the room controller. The table below names every port. Connections From Connect to Why Motion and presence sensors (MQTT in, with msg.source set) occupancy fusion input The raw readings to combine. occupancy fusion output 1 motion policy input Occupancy events: msg.source = \"occupancy\" with msg.payload.occupied . Illuminance sensor (MQTT in, msg.source = \"illuminance\" ) motion policy input Lights come on only when it is dark enough. motion policy output 1 room lighting controller input Lighting intents in msg.lighting . occupancy fusion and motion policy Broker settings Node-RED’s MQTT broker node (optional) Their MQTT publications, only when publishing is on. No wire (without a Broker, as before 6.2: each node’s output 2 to MQTT out). Occupancy fusion sends occupied: true on every motion edge from off (or not yet seen) to on, even when the room is already occupied, as happens when presence held it between motion reports; each one makes the policy cancel its countdown and, if enabled and dark enough, send ON again. Only a repeated motion-on while motion is still on is dropped. Motion going off sends occupied: false unless presence is holding the room, and the first motion reading the node has seen (nothing saved yet) sends it if it is off, even when the room is already vacant. Choose the presence mode. On occupancy fusion, Presence sensor defaults to “None (PIR only)”. Choose “Hold occupancy (PIR + mmWave)” if you wire a presence sensor in. Name the lights. ON targets and OFF targets on the motion policy are JSON arrays of target ids from the room controller’s Targets JSON . Both default to [\"main\"] , the target id in the example flow. Set the vacancy time and lux cutoff. See Vacancy delay and other settings below."
+  "text": "Occupancy flows one way: sensors into occupancy fusion, its events into the motion policy, and the policy’s intents into the room lighting controller, which owns the light commands. Occupancy fusion Motion + presence → occupied → Motion lighting policy Occupancy + lux → ON / OFF intents → Room lighting controller Owns the light commands zigbee2mqtt sensor: output 1 (motion, presence) → occupancy fusion · output 2 (illuminance) → motion policy Broker Optional publishing, through each node’s Broker setting Sensors feed occupancy fusion; occupancy and light level feed the motion policy; its intents feed the room controller. The table below names every port. Connections From Connect to Why A zigbee2mqtt sensor , output 1 (or for another sensor, an MQTT in with msg.source set) occupancy fusion input The raw readings to combine: msg.source \"motion\" or \"presence\" . occupancy fusion output 1 motion policy input Occupancy events: msg.source = \"occupancy\" with msg.payload.occupied . A zigbee2mqtt sensor, output 2 (or an MQTT in, msg.source = \"illuminance\" ) motion policy input Lights come on only when it is dark enough. motion policy output 1 room lighting controller input Lighting intents in msg.lighting . occupancy fusion and motion policy Broker settings Node-RED’s MQTT broker node (optional) Their MQTT publications, only when publishing is on. No wire (without a Broker, as before 6.2: each node’s output 2 to MQTT out). Occupancy fusion sends occupied: true on every motion edge from off (or not yet seen) to on, even when the room is already occupied, as happens when presence held it between motion reports; each one makes the policy cancel its countdown and, if enabled and dark enough, send ON again. Only a repeated motion-on while motion is still on is dropped. Motion going off sends occupied: false unless presence is holding the room, and the first motion reading the node has seen (nothing saved yet) sends it if it is off, even when the room is already vacant. Choose the presence mode. On occupancy fusion, Presence sensor defaults to “None (PIR only)”. Choose “Hold occupancy (PIR + mmWave)” if you wire a presence sensor in. Name the lights. ON targets and OFF targets on the motion policy are JSON arrays of target ids from the room controller’s Targets JSON . Both default to [\"main\"] , the target id in the example flow. Set the vacancy time and lux cutoff. See Vacancy delay and other settings below."
  },
  {
   "title": "Light a room from motion",
@@ -701,7 +701,7 @@ window.DOCS_SEARCH = [
   "section": "Choose an adapter",
   "description": "shelly cover A Gen2-or-later relay device in cover mode, calibrated on the device. Position covers only. It su",
   "url": "guide-device-adapters.html#choose",
-  "text": "shelly cover A Gen2-or-later relay device in cover mode, calibrated on the device. Position covers only. It subscribes to <prefix>/# . zigbee2mqtt cover A Zigbee cover paired with Zigbee2MQTT. Position covers, or open, close and stop only. It subscribes to the device topic and its availability. zigbee2mqtt light A Zigbee light or group paired with Zigbee2MQTT, for a room lighting controller. It subscribes to the light’s state, /set and availability. shelly switch A Gen2-or-later relay behind a wall switch: in detached mode, the switch’s presses for the switch policy; otherwise, the relay as the light. It subscribes to <prefix>/# . wled A WLED strip as a TV backlight, for a backlighting controller: on and off. It subscribes to its device topic’s /g and /status . For any other device, the controller’s neutral commands and readings are the contract to map to; for a light, the room’s neutral light contract ."
+  "text": "shelly cover A Gen2-or-later relay device in cover mode, calibrated on the device. Position covers only. It subscribes to <prefix>/# . zigbee2mqtt cover A Zigbee cover paired with Zigbee2MQTT. Position covers, or open, close and stop only. It subscribes to the device topic and its availability. zigbee2mqtt light A Zigbee light or group paired with Zigbee2MQTT, for a room lighting controller. It subscribes to the light’s state, /set and availability. shelly switch A Gen2-or-later relay behind a wall switch: in detached mode, the switch’s presses for the switch policy; otherwise, the relay as the light. It subscribes to <prefix>/# . zigbee2mqtt sensor A Zigbee motion, presence or light sensor paired with Zigbee2MQTT, for a room’s occupancy fusion and motion lighting policy. It subscribes to the device topic and its availability. wled A WLED strip as a TV backlight, for a backlighting controller: on and off. It subscribes to its device topic’s /g and /status . For any other device, the controller’s neutral commands and readings are the contract to map to; for a light, the room’s neutral light contract ."
  },
  {
   "title": "Connect a device",
@@ -1857,6 +1857,47 @@ window.DOCS_SEARCH = [
   "description": "reading the device’s configuration (grey ring) while the request is out. configuration unreadable: set Mode (r",
   "url": "node-shelly-switch.html#status",
   "text": "reading the device’s configuration (grey ring) while the request is out. configuration unreadable: set Mode (red ring). The mode found, such as detached, switch input (green). With Mode set, it reads detached (set) or relay (set) , followed by what the device says, if read. Relay mode adds the relay state: · on or · off ; with a Target, the light’s: · hall on . Detached, without a Target, with the relay off adds · relay off: bulbs unpowered (yellow ring). offline (grey ring)."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "description": "Message shapes, output ports and settings for the adapter between a Zigbee2MQTT motion, presence or light sensor and a room's occupancy fusion and motion lighting policy.",
+  "url": "node-z2m-sensor.html",
+  "text": "Message shapes, output ports and settings for the adapter between a Zigbee2MQTT motion, presence or light sensor and a room's occupancy fusion and motion lighting policy."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "A sensor’s reports, as the room takes them",
+  "description": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt",
+  "url": "node-z2m-sensor.html#summary",
+  "text": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt sensor”) turns a Zigbee2MQTT sensor’s state reports into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Looking for wiring? Follow Motion and occupancy ."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "Inputs",
+  "description": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its occupanc",
+  "url": "node-z2m-sensor.html#inputs",
+  "text": "Input messages From Message Effect The broker <base>/<friendly name> : the device’s state as JSON Its occupancy, presence and light level, as below. The broker <base>/<friendly name>/availability : {\"state\": \"online\" | \"offline\"} or plain text Shown on the status. An MQTT in node wired to its input changes nothing."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "Outputs",
+  "description": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true",
+  "url": "node-z2m-sensor.html#outputs",
+  "text": "Two output ports Port Message Connect to 1 · Motion and presence {source: \"motion\" | \"presence\", payload: true | false} Occupancy fusion’s input. 2 · Light level {source: \"illuminance\", payload: <lux>} The motion lighting policy’s input."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "Settings",
+  "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
+  "url": "node-z2m-sensor.html#settings",
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one Zigbee2MQTT uses. The node subscribes to exactly <base>/<friendly name> and its /availability (a friendly name can contain / ). Base topic baseTopic · string zigbee2mqtt Zigbee2MQTT’s base topic, unless changed in its settings. It cannot contain + or # . Friendly name friendlyName · string Empty Required. The device’s friendly name in Zigbee2MQTT. It cannot contain + or # . Occupancy is occupancyIs · motion | presence motion What the device’s occupancy field is: a PIR sensor’s motion, or presence on an mmWave sensor that reports it as occupancy."
+ },
+ {
+  "title": "Zigbee2MQTT sensor",
+  "section": "How a report is read",
+  "description": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Li",
+  "url": "node-z2m-sensor.html#readings",
+  "text": "Occupancy ( occupancy ) is motion, or presence with Occupancy is set so; presence ( presence ) is presence. Light level is illuminance_lux where the device sends it (older devices, beside a raw illuminance ), otherwise illuminance , in lux. Only changes are sent: a report whose values haven’t changed, such as a battery or temperature update, sends nothing. A retained occupancy or presence , with retain set for the device in Zigbee2MQTT, is never acted on: after a restart it is an old reading, and a light switched on from it would be wrong. The next report the sensor sends is passed on, whatever it says. A retained light level is passed on. Availability shows on the status ( offline ); nothing is sent for it. After a restart the room learns the sensor’s state on its next change: Zigbee2MQTT doesn’t retain a device’s state by default, and a battery sensor can’t be asked for a reading."
  },
  {
   "title": "WLED",
