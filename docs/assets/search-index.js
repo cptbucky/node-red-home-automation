@@ -1607,7 +1607,7 @@ window.DOCS_SEARCH = [
   "section": "Neutral commands in, Shelly MQTT out",
   "description": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover ",
   "url": "node-shelly-cover.html#summary",
-  "text": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover controller’s neutral commands into the device’s MQTT control commands, and the device’s status reports into neutral cover readings. It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly cover , then Wire a cover for the controller side."
+  "text": "The shelly cover node (type home-shelly-cover ; canvas label: its name, or “shelly cover”) translates a cover controller’s neutral commands into the device’s MQTT control commands, and the device’s status reports into neutral cover readings. It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly cover , then Wire a cover for the controller side. The devices: Shelly’s Gen2+ device documentation (each device’s components and MQTT)."
  },
  {
   "title": "Shelly cover",
@@ -1669,7 +1669,7 @@ window.DOCS_SEARCH = [
   "section": "Neutral commands in, Zigbee2MQTT out",
   "description": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt c",
   "url": "node-z2m-cover.html#summary",
-  "text": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt cover”) translates a cover controller’s neutral commands into Zigbee2MQTT’s set and get messages, and the device’s state reports into neutral cover readings. It has no broker connection of its own: device messages arrive from MQTT in nodes, and its publications leave through an MQTT out node. Never Home Assistant. Looking for wiring? Follow Wire a zigbee2mqtt cover , then Wire a cover for the controller side."
+  "text": "The zigbee2mqtt cover node (type home-z2m-cover ; canvas label: its name, its friendly name, or “zigbee2mqtt cover”) translates a cover controller’s neutral commands into Zigbee2MQTT’s set and get messages, and the device’s state reports into neutral cover readings. It has no broker connection of its own: device messages arrive from MQTT in nodes, and its publications leave through an MQTT out node. Never Home Assistant. Looking for wiring? Follow Wire a zigbee2mqtt cover , then Wire a cover for the controller side. The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
  },
  {
   "title": "Zigbee2MQTT cover",
@@ -1731,7 +1731,7 @@ window.DOCS_SEARCH = [
   "section": "Neutral commands in, Zigbee2MQTT out",
   "description": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt l",
   "url": "node-z2m-light.html#summary",
-  "text": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt light”) translates a room lighting controller’s neutral light commands into Zigbee2MQTT’s /set payloads, and the light’s reports into neutral readings. Use one per light in the room’s targets. It also tells the room’s own commands from someone else’s, and skips a restyle the light already shows; both depend on Zigbee2MQTT’s units, so they are done here rather than in the room. Looking for wiring? Follow Wire the room . For a light that isn’t Zigbee2MQTT’s, see the neutral light contract ."
+  "text": "The zigbee2mqtt light node (type home-z2m-light ; canvas label: its name, its friendly name, or “zigbee2mqtt light”) translates a room lighting controller’s neutral light commands into Zigbee2MQTT’s /set payloads, and the light’s reports into neutral readings. Use one per light in the room’s targets. It also tells the room’s own commands from someone else’s, and skips a restyle the light already shows; both depend on Zigbee2MQTT’s units, so they are done here rather than in the room. Looking for wiring? Follow Wire the room . For a light that isn’t Zigbee2MQTT’s, see the neutral light contract . The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
  },
  {
   "title": "Zigbee2MQTT light",
@@ -1800,7 +1800,7 @@ window.DOCS_SEARCH = [
   "section": "One switch channel, used as the device is set up",
   "description": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one swi",
   "url": "node-shelly-switch.html#summary",
-  "text": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one switch channel of a Shelly Gen2-or-later relay. It reads the device’s own configuration for the channel and works in one of two ways: detached , where the wall switch’s presses go to a switch lighting policy and the relay keeps smart bulbs powered, or relay , where the relay is the light. With a Target , the relay is a room light in either mode, and the node is its adapter on the neutral light contract : the room switches the relay, and sees its state (see As a room light ). It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly switch , then the wall switches guide for the switch policy."
+  "text": "The shelly switch node (type home-shelly-switch ; canvas label: its name, or “shelly switch”) connects one switch channel of a Shelly Gen2-or-later relay. It reads the device’s own configuration for the channel and works in one of two ways: detached , where the wall switch’s presses go to a switch lighting policy and the relay keeps smart bulbs powered, or relay , where the relay is the light. With a Target , the relay is a room light in either mode, and the node is its adapter on the neutral light contract : the room switches the relay, and sees its state (see As a room light ). It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP. Looking for wiring? Follow Wire a shelly switch , then the wall switches guide for the switch policy. The devices: Shelly’s Gen2+ device documentation (each device’s components and MQTT)."
  },
  {
   "title": "Shelly switch",
@@ -1869,7 +1869,7 @@ window.DOCS_SEARCH = [
   "section": "A sensor’s reports, as the room takes them",
   "description": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt",
   "url": "node-z2m-sensor.html#summary",
-  "text": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt sensor”) turns a Zigbee2MQTT sensor’s state reports into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Looking for wiring? Follow Motion and occupancy ."
+  "text": "The zigbee2mqtt sensor node (type home-z2m-sensor ; canvas label: its name, its friendly name, or “zigbee2mqtt sensor”) turns a Zigbee2MQTT sensor’s state reports into the messages occupancy fusion and the motion lighting policy take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant. Looking for wiring? Follow Motion and occupancy . The devices: Zigbee2MQTT’s supported devices (its page there names each device’s fields)."
  },
  {
   "title": "Zigbee2MQTT sensor",
@@ -2020,7 +2020,7 @@ window.DOCS_SEARCH = [
   "section": "Backlight power through WLED’s own MQTT",
   "description": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting cont",
   "url": "node-wled.html#summary",
-  "text": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting controller ’s set_power into WLED’s ON or OFF , and WLED’s brightness reports into the controller’s readings. It talks to WLED through Node-RED’s MQTT broker node, with no MQTT in or out nodes, no function nodes, and never Home Assistant."
+  "text": "The wled node (type home-wled ; canvas label: its name, its device topic, or “wled”) turns a backlighting controller ’s set_power into WLED’s ON or OFF , and WLED’s brightness reports into the controller’s readings. It talks to WLED through Node-RED’s MQTT broker node, with no MQTT in or out nodes, no function nodes, and never Home Assistant. The device: WLED (the WLED project’s documentation)."
  },
  {
   "title": "WLED",

@@ -19,6 +19,7 @@
 <section id="summary"><h2>Neutral commands in, Zigbee2MQTT out</h2>
 <p>The <strong>zigbee2mqtt light</strong> node (type <code>home-z2m-light</code>; canvas label: its name, its friendly name, or “zigbee2mqtt light”) translates a room lighting controller’s neutral light commands into Zigbee2MQTT’s <code>/set</code> payloads, and the light’s reports into neutral readings. Use one per light in the room’s targets. It also tells the room’s own commands from someone else’s, and skips a restyle the light already shows; both depend on Zigbee2MQTT’s units, so they are done here rather than in the room.</p>
 <aside class="callout neutral"><strong>Looking for wiring?</strong><p>Follow <a href="guide-room-lighting.html#wiring">Wire the room</a>. For a light that isn’t Zigbee2MQTT’s, see <a href="node-room-controller.html#light-contract">the neutral light contract</a>.</p></aside>
+<p>The devices: <a href="https://www.zigbee2mqtt.io/supported-devices/">Zigbee2MQTT’s supported devices</a> (its page there names each device’s fields).</p>
 </section>
 <section id="inputs"><h2>Inputs</h2>
 <div class="table-wrap" role="region" aria-label="Input messages; scroll horizontally on a phone" tabindex="0"><table><caption>Input messages</caption><thead><tr><th scope="col">From</th><th scope="col">Message</th><th scope="col">Effect</th></tr></thead><tbody>

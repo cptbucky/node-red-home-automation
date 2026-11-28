@@ -72,6 +72,7 @@
 <script type="text/html" data-help-name="home-shelly-cover">
   <p>Connects a Shelly Gen2 or later device in cover mode to a <b>home cover controller</b>, over the device's own
     MQTT API: no function nodes, no Home Assistant and no HTTP.</p>
+  <p>The devices: <a href="https://shelly-api-docs.shelly.cloud/gen2/" target="_blank">Shelly's Gen2+ device documentation</a>.</p>
   <h3>Wiring</h3>
   <p>With a <b>Broker</b>, it subscribes to <code>&lt;prefix&gt;/#</code> and publishes on its device's topics itself: leave out the MQTT
     in and MQTT out nodes below (still wired, they change nothing). Its first output then sends nothing. It reads its cover on each connect, as a Status node's startup did through the cover controller. A node saved

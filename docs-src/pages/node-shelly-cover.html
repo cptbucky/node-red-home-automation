@@ -9,6 +9,7 @@
 <section id="summary"><h2>Neutral commands in, Shelly MQTT out</h2>
 <p>The <strong>shelly cover</strong> node (type <code>home-shelly-cover</code>; canvas label: its name, or “shelly cover”) translates a cover controller’s neutral commands into the device’s MQTT control commands, and the device’s status reports into neutral cover readings. It has no broker connection of its own: device messages arrive from an MQTT in node, and its publications leave through an MQTT out node. No function nodes, no Home Assistant and no HTTP.</p>
 <aside class="callout neutral"><strong>Looking for wiring?</strong><p>Follow <a href="guide-device-adapters.html#shelly-cover">Wire a shelly cover</a>, then <a href="guide-covers.html">Wire a cover</a> for the controller side.</p></aside>
+<p>The devices: <a href="https://shelly-api-docs.shelly.cloud/gen2/">Shelly’s Gen2+ device documentation</a> (each device’s components and MQTT).</p>
 </section>
 <section id="inputs"><h2>Inputs</h2>
 <p>One input takes both the controller’s commands and the device’s MQTT messages. Anything else is ignored.</p>

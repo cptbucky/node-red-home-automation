@@ -9,6 +9,7 @@
 <section id="summary"><h2>A sensor’s reports, as the room takes them</h2>
 <p>The <strong>zigbee2mqtt sensor</strong> node (type <code>home-z2m-sensor</code>; canvas label: its name, its friendly name, or “zigbee2mqtt sensor”) turns a Zigbee2MQTT sensor’s state reports into the messages <a href="node-occupancy-fusion.html">occupancy fusion</a> and the <a href="node-motion-policy.html">motion lighting policy</a> take. It subscribes through Node-RED’s MQTT broker node itself: no MQTT in, change or function nodes, and never Home Assistant.</p>
 <aside class="callout neutral"><strong>Looking for wiring?</strong><p>Follow <a href="guide-motion-occupancy.html">Motion and occupancy</a>.</p></aside>
+<p>The devices: <a href="https://www.zigbee2mqtt.io/supported-devices/">Zigbee2MQTT’s supported devices</a> (its page there names each device’s fields).</p>
 </section>
 <section id="inputs"><h2>Inputs</h2>
 <div class="table-wrap" role="region" aria-label="Input messages; scroll horizontally on a phone" tabindex="0"><table><caption>Input messages</caption><thead><tr><th scope="col">From</th><th scope="col">Message</th><th scope="col">Effect</th></tr></thead><tbody><tr><td>The broker</td><td><code>&lt;base&gt;/&lt;friendly name&gt;</code>: the device’s state as JSON</td><td>Its occupancy, presence and light level, as below.</td></tr><tr><td>The broker</td><td><code>&lt;base&gt;/&lt;friendly name&gt;/availability</code>: <code>{"state": "online" | "offline"}</code> or plain text</td><td>Shown on the status.</td></tr></tbody></table></div>
