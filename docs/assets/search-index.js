@@ -1945,7 +1945,7 @@ window.DOCS_SEARCH = [
   "section": "Settings",
   "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
   "url": "node-everything-presence-one.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. It cannot contain + or # ."
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. Empty (or, for a node saved before this setting, missing) means homeassistant . It cannot contain + or # ."
  },
  {
   "title": "Everything Presence One",
@@ -2000,7 +2000,7 @@ window.DOCS_SEARCH = [
   "section": "Settings",
   "description": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. ",
   "url": "node-apollo-r-pro-1.html#settings",
-  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. It cannot contain + or # ."
+  "text": "Editor settings and exact defaults Setting / property Default Meaning Name name · string Empty Display label. Broker broker · mqtt-broker None Required. Node-RED’s MQTT broker node, the one the device uses. The node subscribes to exactly the entity state topics below and <device>/status . Device device · string Empty Required. The device’s ESPHome name: the name its discovery is under, and its MQTT topic prefix unless set otherwise. It cannot contain + or # . Discovery prefix discoveryPrefix · string homeassistant Where the device publishes its MQTT discovery: ESPHome’s default, unless set in its configuration. Empty (or, for a node saved before this setting, missing) means homeassistant . It cannot contain + or # ."
  },
  {
   "title": "Apollo R PRO-1",

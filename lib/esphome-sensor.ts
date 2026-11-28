@@ -196,7 +196,8 @@ function text(payload: unknown): string {
 }
 
 // A discovery entry's fields, from Home Assistant's discovery format with
-// or without its abbreviated keys.
+// or without its abbreviated keys. Its "~" base-topic shorthand isn't
+// expanded: ESPHome gives full state and availability topics.
 function discoveredEntity(component: string, object: string, payload: string): DiscoveredEntity | null {
   let entry: unknown;
   try {

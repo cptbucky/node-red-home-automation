@@ -13,10 +13,12 @@
         var device = String(v || "").trim().replace(/^\/+|\/+$/g, "");
         return device !== "" && !/[+#]/.test(device);
       }},
-      // Where the device's discovery is: ESPHome's default.
-      discoveryPrefix: {value: "homeassistant", required: true, validate: function (v) {
-        var prefix = String(v || "").trim().replace(/^\/+|\/+$/g, "");
-        return prefix !== "" && !/[+#]/.test(prefix);
+      // Where the device's discovery is: ESPHome's default. A node saved
+      // before this setting loads without it (the editor applies no defaults
+      // to deployed flows); missing or empty means homeassistant, as the
+      // runtime reads it.
+      discoveryPrefix: {value: "homeassistant", validate: function (v) {
+        return !/[+#]/.test(String(v === undefined || v === null ? "" : v));
       }}
     },
     inputs: 1,
