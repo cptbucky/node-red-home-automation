@@ -1051,3 +1051,23 @@ test("after a start with nothing saved, the display and the AVR are enough: a si
   result = runOut(result);
   assert.deepEqual([result.state.phase, result.state.currentActivity], ["idle", "unknown"]);
 });
+
+test("after a start with nothing saved, two activities that differ only in the silent backlight stay unknown", () => {
+  const profiles = normaliseActivityProfiles({
+    tv_bright: {display: {mode: "tv"}, avr: {power: "on", source: "shield"}, source: {action: "activate", sourceId: "shield", readiness: "required"},
+      lighting: {profile: "tv"}, backlighting: {power: "on"}},
+    tv_dim: {display: {mode: "tv"}, avr: {power: "on", source: "shield"}, source: {action: "activate", sourceId: "shield", readiness: "required"},
+      lighting: {profile: "tv"}, backlighting: {power: "off"}}
+  });
+  const run = (state: Partial<TheatreState> | undefined, theatre: TheatreInputEvent, seconds: number) =>
+    transitionTheatre(state, {theatre}, {...config, activityProfiles: profiles}, at(seconds));
+  const observation = (target: TheatreTarget, values: Record<string, unknown>, seconds: number) =>
+    ({kind: "target_observation", target, observedAt: at(seconds).toISOString(), values}) as TheatreInputEvent;
+  let result = run(undefined, {kind: "startup"}, 0);
+  result = run(result.state, observation("display", {mode: "tv"}, 1), 1);
+  result = run(result.state, observation("avr", {power: "on", source: "shield"}, 1), 1);
+  result = run(result.state, observation("source", {action: "activate", sourceId: "shield"}, 1), 1);
+  for (let seconds = 5; seconds <= 120 && result.state.phase === "recovering"; seconds += 5) result = run(result.state, {kind: "tick"}, seconds);
+  assert.deepEqual([result.state.phase, result.state.currentActivity], ["idle", "unknown"]);
+  assert.equal(result.traces.find((entry) => entry.event === "recovery" && entry.outcome === "unknown")?.reason, "ambiguous");
+});
