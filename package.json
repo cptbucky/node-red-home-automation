@@ -71,7 +71,8 @@
       "home-wled": "dist/nodes/wled.js",
       "home-z2m-sensor": "dist/nodes/z2m-sensor.js",
       "home-everything-presence-one": "dist/nodes/everything-presence-one.js",
-      "home-apollo-r-pro-1": "dist/nodes/apollo-r-pro-1.js"
+      "home-apollo-r-pro-1": "dist/nodes/apollo-r-pro-1.js",
+      "home-z2m-power": "dist/nodes/z2m-power.js"
     }
   },
   "devDependencies": {

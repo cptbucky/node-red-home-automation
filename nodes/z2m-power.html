@@ -1,0 +1,58 @@
+<script type="text/javascript">
+  RED.nodes.registerType("home-z2m-power", {
+    category: "home automation",
+    color: "#e2d96e",
+    defaults: {
+      name: {value: ""},
+      // Node-RED's MQTT broker node, through which it subscribes to its
+      // device's topics. The editor offers the first broker when the dialog is
+      // opened and saved.
+      broker: {value: "", type: "mqtt-broker", required: true},
+      baseTopic: {value: "zigbee2mqtt", required: true, validate: function (v) {
+        var base = String(v || "").trim().replace(/^\/+|\/+$/g, "");
+        return base !== "" && !/[+#]/.test(base);
+      }},
+      // No default: it names the user's own device.
+      friendlyName: {value: "", required: true, validate: function (v) {
+        var name = String(v || "").trim().replace(/^\/+|\/+$/g, "");
+        return name !== "" && !/[+#]/.test(name);
+      }}
+    },
+    inputs: 1,
+    outputs: 1,
+    outputLabels: ["power readings (msg.power), to a display controller or a scene"],
+    icon: "font-awesome/fa-bolt",
+    label: function () { return this.name || this.friendlyName || "zigbee2mqtt power"; },
+    paletteLabel: "zigbee2mqtt power"
+  });
+</script>
+
+<script type="text/html" data-template-name="home-z2m-power">
+  <div class="form-row"><label for="node-input-name">Name</label><input type="text" id="node-input-name"></div>
+  <div class="form-row"><label for="node-input-broker">Broker</label><input type="text" id="node-input-broker"></div>
+  <div class="form-row"><label for="node-input-baseTopic">Base topic</label><input type="text" id="node-input-baseTopic"></div>
+  <div class="form-row"><label for="node-input-friendlyName">Friendly name</label><input type="text" id="node-input-friendlyName" placeholder="the plug's name in Zigbee2MQTT"></div>
+  <div class="form-tips">It subscribes to the plug's topic and its availability itself: no MQTT in or change nodes.</div>
+</script>
+
+<script type="text/html" data-help-name="home-z2m-power">
+  <p>Reads a Zigbee2MQTT plug or meter's power, for whatever judges it: a <b>home display mode controller</b> (its
+    projector's power) or a <b>home scene</b> (its <b>End below</b>). Over Zigbee2MQTT's MQTT messages: no function or
+    change nodes, and never Home Assistant.</p>
+  <p>The devices: <a href="https://www.zigbee2mqtt.io/supported-devices/" target="_blank">Zigbee2MQTT's supported devices</a>.</p>
+  <h3>Wiring</h3>
+  <ol>
+    <li>Its output → a display controller's input (as its projector's power) or a scene's input (for End below).</li>
+    <li>Optional: a display controller's third output (its reading requests) → this node.</li>
+  </ol>
+  <p>Choose the <b>Broker</b> Zigbee2MQTT uses, and set the <b>Friendly name</b> (and the <b>Base topic</b> if you changed
+    Zigbee2MQTT's). It subscribes to <code>&lt;base&gt;/&lt;friendly name&gt;</code> and its <code>/availability</code>.</p>
+  <h3>Readings</h3>
+  <ul>
+    <li>Output: <code>msg.power = {kind: "observed", watts, observedAt}</code> (and <code>msg.payload</code> the watts),
+      from the plug's <code>power</code> only, and only when it changes. A retained (old) report is never passed on.</li>
+    <li>Input: <code>msg.power = {kind: "read"}</code> asks the plug for its power (<code>/get</code>), as it also does
+      each time the broker connects. Plugs that don't answer report on their next change.</li>
+    <li>Availability shows on the status (<i>offline</i>); nothing is sent for it.</li>
+  </ul>
+</script>

@@ -359,6 +359,16 @@ test("the zigbee2mqtt sensor needs a broker and its device, defaults occupancy t
     [2, ["motion and presence, to occupancy fusion", "light level, to the motion lighting policy"]]);
 });
 
+test("the zigbee2mqtt power node needs a broker and its plug; a scene's End below is optional, and valid when a saved scene lacks it", () => {
+  const power = editorDefinition("z2m-power.html");
+  assert.deepEqual([power.defaults.broker!.required, power.defaults.friendlyName!.value, power.defaults.baseTopic!.value, power.outputs], [true, "", "zigbee2mqtt", 1]);
+  const scene = editorDefinition("scene.html");
+  const valid = (key: string, value: unknown) => scene.defaults[key]!.validate!.call({}, value);
+  assert.deepEqual([valid("endBelowWatts", undefined), valid("endBelowWatts", ""), valid("endBelowWatts", 20), valid("endBelowWatts", 0), valid("endBelowWatts", "x")],
+    [true, true, true, false, false]);
+  assert.deepEqual([valid("endBelowSeconds", undefined), valid("endBelowSeconds", 60), valid("endBelowSeconds", -1)], [true, true, false]);
+});
+
 test("the WLED adapter needs a broker and its device topic, which has no default, and has one labelled output", () => {
   const definition = editorDefinition("wled.html");
   assert.deepEqual([definition.defaults.broker!.type, definition.defaults.broker!.required, definition.defaults.deviceTopic!.value],

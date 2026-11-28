@@ -62,6 +62,7 @@
       {"label": "Zigbee2MQTT sensor", "href": "node-z2m-sensor.html"},
       {"label": "Everything Presence One", "href": "node-everything-presence-one.html"},
       {"label": "Apollo R PRO-1", "href": "node-apollo-r-pro-1.html"},
+      {"label": "Zigbee2MQTT power", "href": "node-z2m-power.html"},
       {"label": "WLED", "href": "node-wled.html"}
     ]
   },

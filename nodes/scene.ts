@@ -23,6 +23,9 @@ import {publishingChoice} from "../lib/home-assistant-setting";
 interface SceneNodeConfig extends NodeDef {
   lights?: string;
   safetyHours?: number | string;
+  // Its power end: msg.power below this many watts, for endBelowSeconds.
+  endBelowWatts?: number | string;
+  endBelowSeconds?: number | string;
   area?: string;
   // Publish: off, state or discovery; not set: from publishState and
   // discovery, which it replaced.
@@ -51,7 +54,8 @@ const registerScene: NodeInitializer = (RED) => {
       // Home Assistant.
       const name = textSetting(config.name, "name");
       if (!areaId(name)) throw new Error("name must contain a letter or digit");
-      scene = normaliseSceneConfig({owner: "scene:" + name, lights: config.lights, safetyHours: config.safetyHours});
+      scene = normaliseSceneConfig({owner: "scene:" + name, lights: config.lights, safetyHours: config.safetyHours,
+        endBelowWatts: config.endBelowWatts, endBelowSeconds: config.endBelowSeconds});
       area = optionalArea(config);
       const publish = publishingChoice(config, {publishState: false, discovery: false});
       if (publish.needsArea) publishingArea(area, true);
@@ -100,7 +104,7 @@ const registerScene: NodeInitializer = (RED) => {
       if (result.state.active !== wasActive) lifecycle.publish(send, sceneStateOutputs(publishing, result.state.active));
       node.status(result.status as Parameters<Node["status"]>[0]);
       clearTimeout(timer);
-      const at = sceneTickAt(result.state, Date.now());
+      const at = sceneTickAt(result.state, Date.now(), scene);
       timer = at === null ? undefined : setTimeout(guarded(node, () => process({kind: "tick"}, node.send.bind(node))), Math.max(0, at - Date.now()));
     }
 
@@ -109,6 +113,12 @@ const registerScene: NodeInitializer = (RED) => {
     whenFlowsStarted(RED, node, () => process({kind: "startup"}, node.send.bind(node)));
 
     function handle(msg: InputMessage, send: Send) {
+      // A power meter's reading, for its End below.
+      const power = objectField<{kind?: unknown; watts?: unknown}>(msg, "power");
+      if (power?.kind === "observed" && !objectField(msg, "scene")) {
+        process({kind: "power", watts: power.watts}, send);
+        return;
+      }
       const event = objectField<SceneEvent>(msg, "scene");
       if (event) {
         if (event.kind === "startup") lifecycle.startup(send, sceneStartingOutputs(publishing, active()));
