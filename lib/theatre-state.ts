@@ -114,6 +114,10 @@ export interface TheatreState {
   // While recovering after a start with nothing saved: what each target
   // owner reported its device shows, in answer to the probe.
   recoveryObservations: RecoveryObservations;
+  // Targets an activity was recovered without, as they didn't answer (a
+  // WLED backlight, which can't be asked; a quiet source): unconfirmed until
+  // they report, the activity held ready meanwhile.
+  unobserved: TheatreTarget[];
 }
 
 export function emptyTargets(
@@ -236,7 +240,10 @@ export function createTheatreState(
       ? Object.fromEntries(Object.entries(saved.recoveryObservations)
         .filter(([target, entry]) => (TARGETS as readonly string[]).includes(target) && entry && typeof entry === "object")
         .map(([target, entry]) => [target, {...entry}]))
-      : {}
+      : {},
+    unobserved: Array.isArray(saved.unobserved)
+      ? saved.unobserved.filter((target): target is TheatreTarget => (TARGETS as readonly string[]).includes(target))
+      : []
   };
 }
 
