@@ -199,3 +199,29 @@ test("discovery first: the Apollo with discovery on (either radar naming), witho
   // As the node starts: the discovery topic and the preset's topics.
   assert.ok(esphomeSensorTopics(apollo).initial.includes("homeassistant/+/kitchen-sensor/+/config"));
 });
+
+test("discovery first: an Apollo-shaped set, with both radars, still targets as presence, a disabled light sensor and a running entity", () => {
+  // Written from the discovery format for this test; dev.mdl as the device names its model.
+  const entry = (component: string, object: string, deviceClass: string | null, extra: Record<string, unknown> = {}) => ({
+    topic: `homeassistant/${component}/${apollo.device}/${object}/config`, retain: true,
+    payload: JSON.stringify({name: object, ...(deviceClass ? {dev_cla: deviceClass} : {}), stat_t: `${apollo.device}/${component}/${object}/state`,
+      avty_t: `${apollo.device}/status`, dev: {ids: "test", mdl: "R-PRO-1-ETH"}, ...extra})
+  });
+  let result = apply(undefined, entry("binary_sensor", "moving_target", "motion"), apollo);
+  for (const each of [entry("binary_sensor", "ld2412_moving_target", "motion"), entry("binary_sensor", "presence", "occupancy"),
+    entry("binary_sensor", "still_target", "occupancy"), entry("binary_sensor", "ld2412_presence", "occupancy"),
+    entry("binary_sensor", "ld2412_still_target", "occupancy"), entry("sensor", "ltr390_light", "illuminance"),
+    entry("sensor", "ld2412_light", "illuminance", {en: false}), entry("binary_sensor", "radar_running", "running")]) {
+    result = apply(result.state, each, apollo);
+  }
+  const names = (topics: string[]) => topics.map((topic) => topic.split("/").at(-2)).sort();
+  assert.equal(result.roles.source, "discovered");
+  assert.deepEqual(names(result.roles.motion), ["ld2412_moving_target", "moving_target"]);
+  assert.deepEqual(names(result.roles.presence), ["ld2412_presence", "ld2412_still_target", "presence", "still_target"]);
+  assert.deepEqual(names(result.roles.illuminance), ["ltr390_light"], "the disabled LD2412 light isn't read");
+  assert.ok(!result.topics.some((topic) => topic.includes("ld2412_light") || topic.includes("radar_running")));
+  // An entity disabled later is dropped.
+  result = apply(result.state, entry("binary_sensor", "still_target", "occupancy", {en: false}), apollo);
+  assert.ok(!names(result.roles.presence).includes("still_target"));
+  assert.equal(result.traces[0]?.reason, "disabled");
+});

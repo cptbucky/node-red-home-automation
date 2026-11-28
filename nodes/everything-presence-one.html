@@ -61,7 +61,7 @@
   </ul>
   <h3>How it finds its entities</h3>
   <p>From the device's own MQTT discovery first: each entity it describes, by device class (motion; occupancy or
-    presence; illuminance), with its state topic, so a firmware that renames an entity still works. The device's model
+    presence; illuminance), with its state topic, skipping those it marks disabled by default, so a firmware that renames an entity still works. The device's model
     in its discovery must be this one. Without discovery (turn it on with <code>mqtt: discovery: true</code> in the
     device's ESPHome configuration and flash it again), or with another model's, it uses the entity names below. Its
     status ends with <i>discovered</i> or <i>preset</i>.</p>

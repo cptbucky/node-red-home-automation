@@ -198,7 +198,7 @@ function text(payload: unknown): string {
 // A discovery entry's fields, from Home Assistant's discovery format with
 // or without its abbreviated keys. Its "~" base-topic shorthand isn't
 // expanded: ESPHome gives full state and availability topics.
-function discoveredEntity(component: string, object: string, payload: string): DiscoveredEntity | null {
+function discoveredEntity(component: string, object: string, payload: string): DiscoveredEntity | "disabled" | null {
   let entry: unknown;
   try {
     entry = JSON.parse(payload) as unknown;
@@ -206,6 +206,10 @@ function discoveredEntity(component: string, object: string, payload: string): D
     return null;
   }
   if (!isObject(entry)) return null;
+  // Disabled by default on the device (ESPHome's disabled_by_default, "en":
+  // false): its maker doesn't mean it as one of its sensors, such as the
+  // Apollo's LD2412 light level, a radar reading rather than lux.
+  if (entry.en === false || entry.enabled_by_default === false) return "disabled";
   const field = (short: string, long: string) => (typeof entry[short] === "string" ? entry[short] : typeof entry[long] === "string" ? entry[long] : null) as string | null;
   const stateTopic = field("stat_t", "state_topic");
   if (!stateTopic) return null;
@@ -273,8 +277,14 @@ export function transitionEsphomeSensor(
       trace("discovery", "removed", null, {object});
     } else {
       const entity = discoveredEntity(component, object, payload);
-      if (!entity) trace("discovery", "ignored", "no-state-topic", {object});
-      else state.discovered[topic] = entity;
+      if (entity === "disabled") {
+        delete state.discovered[topic];
+        trace("discovery", "ignored", "disabled", {object});
+      } else if (!entity) {
+        trace("discovery", "ignored", "no-state-topic", {object});
+      } else {
+        state.discovered[topic] = entity;
+      }
     }
     const after = esphomeRoles(state, config);
     if (JSON.stringify(after) !== JSON.stringify(before)) {
