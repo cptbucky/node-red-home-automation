@@ -1564,6 +1564,26 @@ test("a zigbee2mqtt power node through a broker reads its plug on connect, and a
   assert.match(String(lonely.errors[0]), /choose its MQTT broker/);
 });
 
+test("global-enabled still works but is deprecated: one warning per deploy, and a note on the status", async (t) => {
+  const motionRuntime = runtime(registerMotion);
+  const motion = new motionRuntime.Constructor({id: "motion-global", area: "", onTargets: "[\"main\"]", offTargets: "[\"main\"]"});
+  t.after(() => close(motion));
+  await receive(motion, {source: "area-enabled", payload: true});
+  assert.deepEqual(motion.warnings, [], "area-enabled is fine");
+  await receive(motion, {source: "global-enabled", payload: false});
+  await receive(motion, {source: "global-enabled", payload: true});
+  assert.equal(motion.warnings.length, 1, "once per deploy");
+  assert.match(String(motion.warnings[0]), /global-enabled is deprecated and will be removed in 7\.0: send area-enabled/);
+  assert.match((motion.statuses.at(-1) as {text: string}).text, /global-enabled is deprecated$/);
+  // Unchanged: it still sets the shared enable every policy reads.
+  assert.equal(motion.context().global.get("MOTION_ENABLED_STATE"), true);
+  // A new deploy (a new node) warns again.
+  const redeployed = new motionRuntime.Constructor({id: "motion-global", area: "", onTargets: "[\"main\"]", offTargets: "[\"main\"]"});
+  t.after(() => close(redeployed));
+  await receive(redeployed, {source: "global-enabled", payload: true});
+  assert.equal(redeployed.warnings.length, 1);
+});
+
 test("every adapter shows the same badge for a configuration it cannot use, and logs why", () => {
   // One badge text lets people, and the Node-RED smoke, spot any broken node;
   // the reason goes to node.error.

@@ -137,7 +137,8 @@
     <dt>occupancy</dt><dd><code>msg.payload.occupied</code>, from the occupancy fusion node.</dd>
     <dt>illuminance</dt><dd>the light level in lux.</dd>
     <dt>area-enabled</dt><dd><code>true</code> or <code>false</code> for this node; <code>global-enabled</code> for every
-      motion node. Any other value, such as <code>"ON"</code> (accepted before 6.0), is refused: nothing changes, the
+      motion node (deprecated, removed in 7.0: send <code>area-enabled</code> to each policy instead; it still works
+      until then, with a warning once per deploy and a note on the status). Any other value, such as <code>"ON"</code> (accepted before 6.0), is refused: nothing changes, the
       node logs a warning once per deploy and shows it on its status.</dd>
     <dt>delay</dt><dd>a new vacancy time, in <b>seconds</b>, the same unit as <b>Vacancy seconds</b>.</dd>
     <dt>illuminance-cut-off</dt><dd>a new lux cutoff.</dd>
@@ -168,8 +169,8 @@
       <code>home/&lt;area&gt;/motion/availability</code>. It acts on <code>ON</code>/<code>OFF</code> sent to
       <code>…/enabled/set</code> and a delay of 0 to 86400 seconds sent to <code>…/delay/set</code>, as the
       <code>area-enabled</code> and <code>delay</code> inputs do; wire an MQTT in node on
-      <code>home/&lt;area&gt;/motion/+/set</code> into this node. The shared <code>global-enabled</code> is not
-      published, and the switch shows this node's enable only, so motion can still be off everywhere while it
+      <code>home/&lt;area&gt;/motion/+/set</code> into this node. The shared <code>global-enabled</code> (deprecated) is
+      not published, and the switch shows this node's enable only, so motion can still be off everywhere while it
       shows on.</dd>
     <dt>Publish: MQTT state and Home Assistant discovery</dt><dd>a motion lighting switch and a vacancy delay number (in the device's
       configuration). It includes the MQTT state, which they read.</dd>

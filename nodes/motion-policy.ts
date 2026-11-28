@@ -88,13 +88,18 @@ const registerMotionPolicy: NodeInitializer = (RED) => {
       return;
     }
 
+    // global-enabled, the house-wide enable every motion policy obeys, is
+    // deprecated (removed in 7.0): told once per deploy, and on the status
+    // from then on. It still works until then.
+    let usedGlobalEnabled = false;
+
     function updateStatus(status: MotionStatus) {
       node.status({
         fill: status.enabled ? "green" : "grey",
         shape: "dot",
         text: (status.enabled ? "enabled" : status.paused ? "paused" : "disabled") + " · " +
           (status.illuminance === null ? "lux ?" : status.illuminance + " lux") + " · " +
-          status.delaySeconds + "s"
+          status.delaySeconds + "s" + (usedGlobalEnabled ? " · global-enabled is deprecated" : "")
       });
     }
 
@@ -154,6 +159,11 @@ const registerMotionPolicy: NodeInitializer = (RED) => {
         });
       if (input.source === "global-enabled") {
         globalContext.set("MOTION_ENABLED_STATE", result.globalEnabled);
+        if (!usedGlobalEnabled) {
+          usedGlobalEnabled = true;
+          node.warn("global-enabled is deprecated and will be removed in 7.0: send area-enabled (true or false) to each " +
+            "motion lighting policy instead");
+        }
       }
 
       for (const effect of result.effects) {
